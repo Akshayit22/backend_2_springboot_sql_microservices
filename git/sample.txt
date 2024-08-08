@@ -1,3 +1,3 @@
-this is text
+this is text.
 
-second change
+second change.

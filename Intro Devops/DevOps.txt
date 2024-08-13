@@ -1,2 +1,26 @@
 "Introduction to DevOps: definition, history, culture, principles, and practices"
 
+
+
+DevOps phases :	
+	
+	Plan ------------ based on user requirements	
+
+	Code ------------ IDE, git, gitHub, v1, v2
+
+	Build ----------- executable file created using Maven or gradle
+
+	Test ------------ selenium testing
+
+	Integration ----- Jenkins 
+
+	Deploy ---------- AWS
+
+	Operate --------- Anisible, Docker, Kubernates
+
+	Monitor --------- Nagios
+
+ 
+What i Know : 
+	
+	Git workflow, Aws, EC2, How to automate deployement.

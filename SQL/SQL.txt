@@ -1,0 +1,647 @@
+	"ER Diagram,Relationship Mapping (One-to-One, One-to-Many, Many-to-Many)"
+	Intro to SQL
+	Intro to No-SQL
+	SQL vs No - SQL
+	Indexing
+	Transaction, procedures, functions ,trigger,views
+	Data Manipulation
+	CRUD operations
+	Overview of MySQL  and its features
+	Installation and configuration of MySQL Server
+
+
+/*-------------- SQL & No SQL Overview ------------------*/	
+
+Structured Query Language : manages data in RDBMS
+
+SQL ex . sql server, mysql, IBM DB2, Sybase,Oracle
+
+SQL Languages : 
+		
+	1. DDL (Data Defination):
+		CREATE, ALTER, RENAME, DROP
+
+	2. DML (Data Manupulation):
+		INSERT, UPDATE, DELETE
+
+	3. TCL (Transaction Control):
+		Commit, Rollback, Save Point
+
+	4. DCL (Data Control) :
+		Grant, Revoke 
+
+	5. DQL (Data query):
+		Select
+
+Data Types : 
+	int, float, double 
+	char, varchar(x)
+	datatime
+
+Creating Tables : 
+
+	CREATE TABLE table_name(
+		column_name1 data_type,
+		column_name2 data_type,
+		column_name3 data_type,
+	) 
+
+	Example: 
+
+	CREATE TABLE CUSTOMER(
+		CustomerId     int IDENTITY(1,1) PRIMARY KEY,
+		CustomerNumber int         NOT NULL UNIQUE,
+		LastName       varchar(50) NOT NULL,
+		FirstName      varchar(50) NOT NULL,
+		AreaCode       int         NULL,
+		Address        varchar(50) NULL,
+		Phone 		   varchar(50) NULL,
+
+		SchoolId int NOT NULL FOREIGN KEY REFERENCES SCHOOL (SchoolId),
+	)
+
+PRIMARY	KEY : 
+
+	The	PRIMARY	KEY	constraint uniquely identifies each	record in a database table
+
+FOREIGN	KEY: 
+	A FOREIGN KEY in one table points to a PRIMARY	KEY	in	another	table
+
+	ex. 
+		SchoolId int NOT NULL FOREIGN KEY REFERENCES SCHOOL (SchoolId),
+
+
+NOT NULL: 		A column cannot have a NULL value by using the NOT NULL flag. 
+			Ex. FirstName varchar(20) NOT NULL,
+
+UNIQUE: 		A unique value makes sure that each value in a column is distinct. 
+			Ex. 
+
+PRIMARY KEY:	A NOT NULL and UNIQUE combination. Identifies each table row in a unique way. 
+FOREIGN KEY:	Prevent acts that would break linkages between tables. 
+
+CHECK : 		Verifies if the values in a column meet a certain requirement. 
+			Ex. Age int,
+				CHECK (Age >= 18)
+
+DEFAULT: 		If no value is specified, DEFAULT sets a default value for the column.
+			Ex. City varchar(15) DEFAULT 'LONDON'
+
+CREATE INDEX :  Used to easily create and access data from the database.
+
+
+
+
+
+
+CREATE :
+	> create database db_name;
+	> create table t_name( ... );
+
+
+ALTER TABLE : 
+
+		> ALTER TABLE TABLE_NAME
+		  ADD/DROP COLUMN_NAME DATATYPE;
+
+		(change datatype)
+		> ALTER TABLE table_name
+		  COLUMN column_name datatype
+
+RENAME:
+	> Rename table_name TO new_table_name;
+
+	> Alter table table_name
+	  RENAME COLUMN col_name TO New_col_name;
+
+UPDATE TABLE:
+
+>	UPDATE table_name
+	SET column1=value, column2=value2,...
+	WHERE some_column=some_value
+
+	ex: 
+
+	> update CUSTOMER set AreaCode=46 where CustomerId=2
+
+DELETE COMMAND:
+	
+>	DELETE FROM table_name
+	WHERE some_column=some_value
+
+DROP :
+	> Drop database db_name;
+	> Drop table t_name;
+
+	> Truncate table t_name;
+
+Show :
+	> Show databases;
+	> show tables;
+
+
+
+SELECT COMMAND :
+	
+	SELECT 
+	[ ALL | DISTINCT ] 
+	 [TOP ( expression ) [PERCENT] [ WITH TIES ] ]
+	select_col_list [ INTO new_table ] 
+	[ FROM table_source ] 
+	[ WHERE search_condition ] 
+	[ GROUP BY group_by_expression ] 
+	[ HAVING search_condition ] 
+	[ ORDER BY order_expression [ ASC | DESC ] ]
+
+operator :
+
+operator	Description
+
+= 			Equal
+<> 			Not	equal	
+> 			Greater	than	
+< 			Less	than	
+>= 			Greater	than	or	equal	
+<= 			Less	than	or	equal	
+
+BETWEEN 	Between	an	inclusive	range	
+LIKE 		Search	for	a	pattern
+IN 			If	you	know the exact value you want to return	
+			for	at least one of the columns.
+
+LIKE OPERATOR:
+	where LastName like 'J%' 			(begining with 'J'), 
+	where LastName like '%a%'			( inludes 'a')
+	where LastName not like '%a%'		( not includes 'a')
+
+	WHERE LastName LIKE '__a__'			( five chars with 'a' in middle)
+	WHERE CustomerNumber LIKE '[10]%'
+
+
+IN :
+	WHERE column_name IN (value1,value2,...)
+
+	WHERE column_name IN (SELECT statment)
+
+
+BETWEEN:
+
+includes the boundary values.so values equal to value1 or value2 will be included in the result
+can be used with datas, timestamp, strings
+	WHERE column_name
+	BETWEEN value1 AND value2
+
+	ex. where order_amount BETWEEN 2100 AND 2900;
+
+	    where order_amount NOT BETWEEN 2100 AND 2900;
+
+
+	BETWEEN with IN : 
+
+	 		> where order_amount NOT BETWEEN 2100 AND 2900
+	 		  AND order_id IN (1,2,8);
+
+
+AND / OR:
+	where LastName='Smith' and FirstName='John'
+	where LastName='Smith' or FirstName='John'
+
+
+TOP [number | percent]: 
+	select TOP 1 * from CUSTOMER
+	select TOP 60 percent * from CUSTOMER
+
+
+
+
+Views in database:
+
+	CREATE VIEW <ViewName>
+	AS select * from table1, table2 where condition;
+ex.
+	CREATE VIEW SchoolView
+	AS
+	SELECT SCHOOL.SchoolName, CLASS.ClassName
+	FROM SCHOOL 
+	INNER JOIN CLASS 
+		ON SCHOOL.SchoolId = CLASS.SchoolId;
+
+
+
+Stored Procedures :
+Ex. 
+	
+	CREATE PROCEDURE GetAllSchoolClasses
+	AS
+	select SCHOOL.SchoolName, CLASS.ClassName
+	from SCHOOL
+	inner join CLASS 
+		on SCHOOL.SchoolId = CLASS.SchoolId
+			order by SchoolName, ClassName;
+
+
+	> execute GetAllSchoolClasses
+
+Triggers
+A database trigger	is	code that is automatically	executed in	response to	certain	events on a particular table in a database.
+
+ex :
+	CREATE TRIGGER CheckPhoneNumber ON CUSTOMER
+	FOR UPDATE, INSERT, DELETE
+	AS
+	DECLAR
+		--
+	BEGIN
+		--
+	END
+	/
+
+
+Built-in Functions :	
+Aggregate functions - examples:
+
+	• AVG() -   Returns	the	average	value
+	• SUM() -   Returns	the	sum
+	• MAX() -   Returns	the	largest	value
+	• MIN() -   Returns	the	smallest	value
+	• COUNT() - Returns	the	number	of	rows
+	• STDEV() - Returns	the	standard deviation	value
+
+	Ex. 
+		> select SUM(order_amount), AVG(order_amount), 
+				 COUNT(*), 			MAX(order_amount),
+				 MIN(age)
+		  from orders;
+
+Scalar functions - examples:
+
+	• UPPER() - Converts	a	field	to	upper	case
+	• LOWER() - Converts	a	field	to	lower	case
+	• LEN()   - Returns	the	length	of	a	text	field
+	• ROUND() - Roundups to the number of decimals specified
+	• GETDATE() - Returns	the	current	system	date	and	time
+
+
+
+
+LOCK:
+
+	> LOCK TABLE table_name IN Lock_mode;
+
+GRANT :
+
+	> GRANT SELECT, UPDATE 
+	  ON MY TABLE 
+	  TO SOME_USER, ANOTHER USER;
+
+REVOKE :
+
+	> REVOKE SELECT, UPDATE 
+	  ON MY TABLE
+	  FROM some_user, another_user;
+
+
+TRANSACTION CONTOL:
+	begin : 	BEGIN
+
+	commit:		COMMIT;
+
+	rollback: 	ROLLBACK;
+
+	savepoint:  SAVEPOINT name;
+
+
+Sql query execution order :
+ 
+ 	WHERE  >  FROM  > GROUP BY > HAVING > SELECT > ORDER BY > LIMIT;
+
+
+ALISE: 
+	1. column alise : 
+		select fullname as FN from employee;
+
+	2. table alise : 
+
+		> select o.orderId, o.date
+		  from customer as c , orders as o
+		  where o.id = c.id;
+
+
+--------WHERE - HAVING :
+
+1.Can you use aggregate functions in the WHERE clause?
+
+	No, you cannot use aggregate functions directly in the WHERE clause. Instead, you
+	typically use them in the HAVING clause to filter the results of aggregate queries.
+
+2.What is the difference between WHERE and HAVING clauses?
+
+	The WHERE clause is used to filter rows before they are grouped or aggregated, while
+	the HAVING clause is used to filter grouped or aggregated results. The HAVING clause
+	can use aggregate functions, unlike the WHERE clause.
+
+
+
+
+-----------------------------------  JOINS	------------------------------------------------
+
+1. Inner join : 
+
+	If the criteria is met, the INNER JOIN keyword selects all rows from both tables. 
+	By merging all rows from both tables that meet the requirement—that is,
+	have the same value for the shared field
+
+	>	SELECT * 
+		FROM T1
+		INNER JOIN T2 
+			ON T1.id = T2.id
+
+	> select * from city c inner join country co where c.CountryCode = co.Code limit 50;
+	> select c.ID, c.Name, co.code,co.Capital from city c inner join country co where 
+	  c.CountryCode = co.Code and co.code like' IND%';
+
+
+2. Rigth Join : === (RIGHT OUTER JOIN)
+
+	Gives all rows from the table one rigth side of join as well as any matching rows from left table.
+	The result-set will include null for any rows for which there is no matching row on the left.
+
+	>	SELECT * 
+		FROM T1
+		RIGTH JOIN T2
+		ON T1.id = T2.id;
+
+	>  select * 
+	   from users u 
+	   right join accounts a 
+	   ON u.user_id = a.user_id;
+
+	>  select u.user_id,u.username,a.name 
+	   from accounts a 
+	   right join users u 
+	   ON u.user_id = a.user_id;
+
+
+2. Left Join : === (LEFT OUTER JOIN)
+
+	The rows that match for the table on the right side of the join are returned along with all
+	of the rows from the table on the left side of the join.
+	The result-set will include null for all rows for which there is no matching row on the right side.
+
+	>	SELECT * 
+		FROM T1
+		LEFT JOIN T2
+		ON T1.id = T2.id;
+
+	>  select * 
+	   from users u 
+	   left join accounts a 
+	   ON u.user_id = a.user_id;
+
+	>  select u.user_id,u.username,a.name 
+	   from accounts a 
+	   left join users u 
+	   ON u.user_id = a.user_id;
+
+
+
+3. Full join: 
+	
+	combining the results of both LEFT JOIN and RIGHT JOIN,
+	. The result-set will contain NULL values for the rows where there was no match.
+
+	> null for the values not matched from both right and left table. 
+
+	>  select u.user_id,u.username,a.name 
+	   from accounts a 
+	   full join users u 
+	   ON u.user_id = a.user_id;
+
+
+4. CROSS JOIN: 
+
+	Cartesian product: 
+		A CROSS JOIN generates a Cartesian product of the two tables
+		involved, combining every row from the first table with every row from the second 
+		table. This can be useful in scenarios where you need to explore all possible 
+		combinations between two sets of data.
+
+		> select * from users cross join accounts; 
+
+
+5. NATURAL JOIN : not recommanded
+	
+		The NATURAL JOIN is a type of join operation in SQL that combines tables based on
+		columns with the same name and data type.
+		It automatically matches columns between tables and returns only the matching rows.
+
+		> select * from users accounts join users;
+
+
+6. self join : (imp)
+		- to match the one record from table to another record from same table
+
+		(find  childs and their parent thwy stored in same table)
+
+		>	select child.name as child_name, child.age as child_age
+					parent.name as parent_name, parent.age as parent_age
+			from family as child 
+			self join family as parent 
+			on child.parent_id = parent.member_id;
+
+
+
+------------------------------------- JOIN ADV ------------------------------------------------
+
+fetch All employee with their manager and departement, projects they are working.
+
+> select e.name, d.d_id, m.name
+  from employee e
+  left join department d 
+  	on e.d_id = d.d_id
+  inner join manager m 
+    on m.m_id = e.m_id
+  left join projects p
+  	on p.member_id = e.emp_id;
+
+
+
+-----------------------------------------------------------------------------------------------
+
+GROUP BY Statement :
+	
+	For categorizing rows of data based on one or more columns. used for Data Summarization
+
+	>  select user_id,sum(balance) from accounts group by accounts.user_id;
+	>  select account_type,sum(balance) from accounts group by accounts.account_type; 
+
+
+The	HAVING	Clause : 
+	HAVING clause in SQL is used to restrict the results of a query. To filter grouped data, it is frequently combined with the GROUP BY clause.
+
+	The WHERE clause is used to filter rows before grouping and aggregation, while the HAVING clause is used to filter the grouped data after grouping and aggregation
+
+	SELECT column_name, aggregate_function(column_name)
+	FROM table_name
+	WHERE column_name operator value
+	GROUP BY column_name
+	HAVING aggregate_function(column_name) operator value
+
+	ex.
+	select CourseId, AVG(Grade) from GRADE
+	group by CourseId
+	having AVG(Grade)>3
+
+
+
+
+-----------------------------------------------------------------------------------------------
+
+--  Subquery or Nested Query: 
+
+		An in-line subquery is enclosed in parentheses and placed within the WHERE or HAVING clause of the main query.
+
+		>	select col1
+			from table1
+			where column2 = 
+							(
+								select AVG(column3) 
+								from table2
+								where condition 
+							);
+
+
+		>	select col1
+			from table1
+			where column2 IN 
+							(
+								select column3 
+								from table2
+								where condition 
+							);
+
+		EX.
+		> select * from customer c where c.address_id In (select address_id from address); 
+
+
+
+-- Union and Union all : 
+
+-->e UNION operator only chooses distinct values. To allow duplicate values, use UNION ALL.
+
+	1. UNION :
+
+		> select col1 from table1
+		  union 
+		  select col1 from table2;
+
+		>  select email from customer union select postal_code from address;  
+
+
+    2. UNION All :
+
+		> select col1 from table1
+		  union all
+		  select col1 from table2;
+
+
+	2. Intersect :
+
+		> select col1 from table1
+		  Intersect
+		  select col1 from table2;
+
+	3. MINUS / EXCEPT:
+
+		> select col1 from table1
+		  minus / except
+		  select col1 from table2;
+
+
+	ANY: ANY operator returns true if the comparison is true for at least one value in the set.
+
+		> select col1
+		  from table
+		  where col1 > ANY ( select col1 from table2 wherer condition)
+
+	ALL: ALL returns true if the comparison is true for all values in the set.
+
+		> select All cols
+		  from table 
+		  where condition;
+
+
+--------------------------------------------------------------------------------------------
+
+-- String Function :
+	
+	1. CONCAT(str1, str2)
+	2. LENGTH(str2)
+	3. UPPER(str)
+	4. LOWER(str)
+	5. substring( str, start , length)
+
+	6. LEFT('database',4) ----> data
+	7. RIGHT('table', 3) -----> ble
+
+	8. TRIM('Hello  ')  ------> removes trailing spaces
+	9. REPLACE('HELLO, WORLD', 'WORLD' ,'SQL')   -----> HELLO, SQL  REPLACE(str, replacement value, search value):
+
+
+
+
+---  Data Function : 
+
+	1. CURRENT_DATE() -- CURRENT_TIME() --- CURRENT_TIMESTAMP()
+
+	2. EXTRACT (YEAR FROM '2024-07-02')
+
+	3. DATEDIFF( DAY , '2024-07-02', '2025-08-02')
+
+	4. DATEPART ( HOUR, 'timestamp')
+
+	5. DAYNAME(date) ----- MONTHNAME(date)
+
+
+--- row_number() and rank() function
+
+> select row_number() over(order by balance desc) as row_no, balance from accounts;
+
+> select RANK() over(order by balance desc) as row_no, balance from accounts;
+
+
+-----------------------------------------------------------------------------
+
+CTE(Common Table Expression) IN SQL:
+		a temporary named result set may be referred to within a query
+
+	   > With EmployeeDepartment AS(
+
+	   		select e.eid, e.name, d.dname
+	   		from employee e
+	   		join departments d 
+	   			on e.d_id = d.d_id
+
+	     )
+
+	   > select * from EmployeeDepartment;
+
+
+CTE(Common Table Expression) IN SQL: (Recursive)
+
+		>	WITH employeeManagerCTF AS(
+
+				select empId, managerId
+				from employees 
+				where empId = 1 
+
+				union all
+
+				select e.empId, e.managerId
+				from employee as e
+				inner join employeeManagerCTF as r
+				on e.empId = e.empId
+
+			)
+
+		> select * from employeeManagerCTF;

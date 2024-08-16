@@ -1,0 +1,61 @@
+/*-------------------------------------------------------------------------------*/
+							Unit test cases
+
+------ Mockito :
+	
+	<dependency>
+		<groupId>org.mockito</groupId>
+		<artifactId>mockito-core</artifactId>
+		<version>2.13.0</version>
+	</dependency>
+
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-test</artifactId>
+		<scope>test</scope>
+	</dependency>
+
+		>  @Profile("test")
+		>
+			@Profile("test")
+			@Configuration
+			public class ProductServiceTestConfiguration {
+				@Bean
+				@Primary
+				public ProductService productService() {
+					return Mockito.mock(ProductService.class);
+				}
+			}
+
+	> Now, you can write a Unit Test case for Order Service under the 
+	src/test/resources package.
+
+	> 
+		@SpringBootTest
+		@ActiveProfiles("test")
+		@RunWith(SpringJUnit4ClassRunner.class)
+		public class MockitoDemoApplicationTests {
+			@Autowired
+			private OrderService orderService;
+
+			@Autowired
+			private ProductService productService;
+
+			@Test
+			public void whenUserIdIsProvided_thenRetrievedNameIsCorrect() {
+				Mockito
+					.when(productService.getProductName())
+					.thenReturn("MockProduct Name");
+				
+				String testName = orderService.getProductName();
+				Assert.assertEquals("Mock Product Name", testName);
+			}
+		}
+
+
+-----------------------------------------------------------------------------------
+								Rest Controller Unit Test
+
+	- SpringJUnit4ClassRunner and MockMvc
+
+	- Unit Tests should be written under the src/test/java directory and classpath resources for writing a test should be placed under the src/test/resources directory.

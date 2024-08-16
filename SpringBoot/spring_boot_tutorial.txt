@@ -1,0 +1,623 @@
+/*---------------------------- Spring Boot Recap -------------------------------*/
+
+-------------------------------------
+Topics to recap: 
+	Basics of Spring Boot
+	Spring Boot Annotations and Configuration
+	Spring Boot RESTful Web Services
+	Spring Boot Security (Authentication and Authorization)
+
+	Spring Boot Data Access with JPA and Hibernate
+	Model Binding and Validation
+
+------------------------------------
+New Topics to learn :
+
+	
+	Spring Boot Microservices
+	Working with Databases and ORM (Object-Relational Mapping) -Hibernate
+	"Entity Mapping with Hibernate,Hibernate Session and Transaction Management,Hibernate Query Language (HQL)"
+	"Criteria API in Hibernate,Caching in Hibernate"
+	Handling Inheritance in Hibernate
+	Performance Optimization with ORMs
+	"JUnit Framework Basics,Mocking Dependencies with Mockito"
+	Testing Data Access with Spring Boot
+	Code Coverage Tools
+	Deployment and hosting
+
+
+----------------------------------------------------------------------------------
+
+Spring Boot - 
+	
+	open source java framework for micro services.
+	we can create stand-alone and production-grade spring application that you can just run.
+
+Micro services -
+	
+	developers can create and deploy services independently. each service has its own process.
+
+	Advantage : 
+		easy deployment, scalable, less production time,
+		minimum configuration, can use containers.
+
+
+--------------------------------------------------------------------
+
+How spring Boot works: 
+	
+	It automatically configures application using - @EnableAutoConfiguration
+
+	@SpringBootApplication - entry point of application
+		includes :
+			- @ComponentScans  - scans all component in project 
+			- @EnableAutoConfiguration
+			- @SpringBootConfiguration
+
+
+	Creating Executable jar file :
+
+		> mvn clean install
+
+		> java –jar <JARFILE>
+
+-----------------------------------------------------------------------
+
+				Application Runner & Command Line Runner 
+
+
+Application Runner :
+	is an interface used to execute the code after the Spring Boot application started.(implement ApplicationRunner & override run method)
+	Ex. 
+
+	public class DemoApplication implements ApplicationRunner {
+		public static void main(String[] args) {
+			SpringApplication.run(DemoApplication.class, args);
+		}
+
+		@Override
+		public void run(ApplicationArguments arg0) throws Exception {
+			System.out.println("Hello World from Application Runner");
+		}
+	}
+
+Command Line Runner :
+	same as application runnner.
+	 println statement is executed after the Tomcat started
+
+	@SpringBootApplication
+	public class DemoApplication implements CommandLineRunner {
+		public static void main(String[] args) {
+			SpringApplication.run(DemoApplication.class, args);
+		}
+		@Override
+		public void run(String... arg0) throws Exception {
+			System.out.println("Hello world from Command Line Runner");
+		}
+	}
+
+-----------------------------------------------------------------------
+command line properties :
+
+	> java –jar <JARFILE> --server.port=9090
+
+Externalized properties :
+	> java -jar -Dspring.config.location=C:\application.properties <jarfile>
+
+
+Value Annotation : To read the env/application properties.
+	
+	@Value("${property_key_name:default_value}")
+	String sample;
+
+		Ex .      @Value("${spring.application.name:default_name}")
+
+-------------------------------------------------------------------------
+
+				Spring Boot Active Profile: 
+	
+	 different properties based on the Spring active profile. 
+	 ex. separate files for development and production
+	 	-application.properties
+	 	-application-dev.properties
+
+	 > java –jar <JARFILE> --spring.profile.active=dev or prod
+
+	 or in properties file 
+
+--------------------------------------------------------------------------
+						Spring Boot Logging
+
+	console log output :
+			> java –jar demo.jar --debug
+		or 
+			debug=true in application.properties
+
+	file log output :
+
+		 need to set the property logging.file or logging.path in the application.properties file.
+		 ex. 
+		 	logging.path=/var/tmp/
+		 	logging.file=/var/tmp/mylog.log
+
+	Log Levels: 
+		set properties --> logging.level.root=WARN
+
+			logger levels such as 
+			“TRACE”, “DEBUG”, “INFO”, “WARN”, “ERROR”, “FATAL”, “OFF”.
+
+	Log configuration :
+		logback.xml 	
+
+---------------------------------------------------------------------------
+		
+						REST Api in SpringBoot
+
+@Controller vs @RestController
+
+RestController : 
+		 It serves JSON, XML and custom response.
+	
+@Component
+
+@RequestMapping : 
+	To define the Request URI to access the REST Endpoints.
+	ex.
+		@RequestMapping(value="/hello", method="GET")
+
+@RequestBody :
+	Annotation is used to define the request body content type.
+
+	Ex. 
+		public boolean createProduct(@RequestBody Product product) { ... }
+
+@pathVariable :
+	define the custom or dynamic request URI.
+	Ex. 
+	@RequestMapping(value="/update/{id}", method="POST")
+	public Object updateProduct(@PathVariable("id") String id) { ... }
+
+ @RequestParam :
+ 	used to read the request parameters from the Request URL.
+ 	Ex. 
+ 		(@RequestParam(value="name", required=false, defaultValue="honey") 
+ 			String name) { ......... }
+
+@ResponseEntity : 
+	public ResponseEntity<Object> getProduct() {
+		return new ResponseEntity<>(productRepo.values(), HttpStatus.OK);
+	}
+
+
+-------------- rest template and exchage() ---- to watch video
+
+-----------------------------------------------------------------------
+
+ API Methods:
+
+ 	@RequestMapping(value="/products", method=RequestMethod.POST)
+
+ 	@RequestMapping(value="/products/{id}", method=RequestMethod.PUT)
+
+ 	@RequestMapping(value="/products/{id}", method=RequestMethod.DELETE)
+
+
+------------------------------------------------------------------------
+
+					Exception Handling
+
+Controller Advice :	
+
+	@ControllerAdvice
+		To handle the exceptions globally.
+
+	@ExceptionHandler 
+		To handle the specific exceptions and sending the custom responses to the client
+
+--Exception Package : 
+	
+	@ControllerAdvice
+	public class ProductExceptionController {
+		@ExceptionHandler(value = ProductNotfoundException.class)
+		public ResponseEntity<Object> exception(ProductNotfoundException exception) {
+			return new ResponseEntity<>("Product not found", HttpStatus.NOT_FOUND);
+		}
+	}
+
+	public class ProductNotfoundException extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+	}
+
+---------------------------------------------------------------------------
+
+								Interceptor
+
+We can perform operations :
+
+	-- Before sending the request to the controller
+	-- Before sending the response to the client    
+
+For example, 
+	you can use an interceptor to add the request header before sending the request to the controller and add the response header before sending the response to the client
+
+	classes : HandlerInterceptor: method preHandle, postHandle, afterCompletion
+
+code---------------->
+
+	@Component
+	public class ProductServiceInterceptor implements HandlerInterceptor {
+		@Override
+		public boolean preHandle(HttpServletRequest request, HttpServletResponse 
+			response, Object handler) throws Exception {
+			return true;
+		}
+
+		@Override
+		public void postHandle(HttpServletRequest request, HttpServletResponse 
+			response, Object handler, ModelAndView modelAndView) throws Exception {}
+
+		@Override
+		public void afterCompletion(HttpServletRequest request, 
+			HttpServletResponse response, Object handler, Exception exception) throws Exception 
+			{}
+	}
+
+You will have to register this Interceptor with InterceptorRegistry by using 
+WebMvcConfigurerAdapter as shown below Configs :
+
+	@Component
+	public class ProductServiceInterceptorAppConfig extends WebMvcConfigurerAdapter {
+
+		@Autowired
+		ProductServiceInterceptor productServiceInterceptor;
+
+		@Override
+		public void addInterceptors(InterceptorRegistry registry) {
+			registry.addInterceptor(productServiceInterceptor);
+		}
+	}
+
+
+
+---------------------------------------------------------------------------------
+					
+					 File Handling
+
+* File Upload : 
+	For uploading a file, you can use MultipartFile as a Request Parameter and this API should consume Multi-Part form data value.
+
+	@RequestMapping(value="/upload", 
+					method=RequestMethod.POST, 
+					consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+				)
+	public String fileUpload(@RequestParam("file") MultipartFile file) {
+		return null;
+	}
+
+	Full controller File Upload: 
+
+	@RestController
+	public class FileUploadController {
+		@RequestMapping(value="/upload", 
+						method=RequestMethod.POST, 
+						consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+					)
+		public String fileUpload(@RequestParam("file") MultipartFile file) throws 
+		IOException {
+		
+			File convertFile = new File("/var/tmp/"+file.getOriginalFilename());
+			convertFile.createNewFile();
+			FileOutputStream fout = new FileOutputStream(convertFile);
+			fout.write(file.getBytes());
+			fout.close();
+			return "File is upload successfully";
+		}
+	}
+
+	Full controller File Download: 
+
+	@RestController
+	public class FileDownloadController {
+		@RequestMapping(value="/download", method=RequestMethod.GET) 
+		public ResponseEntity<Object> downloadFile() throws IOException {
+
+			String filename = "/var/tmp/mysql.png";
+			File file = new File(filename);
+			InputStreamResource resource = 
+							new InputStreamResource(new FileInputStream(file));
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.add("Content-Disposition", String.format("attachment; 
+			filename=\"%s\"", file.getName()));
+			headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+			headers.add("Pragma", "no-cache");
+			headers.add("Expires", "0");
+			ResponseEntity<Object> responseEntity = 
+			ResponseEntity.ok().headers(headers).contentLength(file.length()).contentType(M
+			ediaType.parseMediaType("application/txt")).body(resource);
+			return responseEntity;
+		}
+	}
+
+
+--------------------------------------------------------------------------------
+
+								Service Component 
+
+Good Practice : 
+				public interface ProductService {
+					// unimplemented / abstract methods
+				}
+
+				@Service
+				public class ProductServiceImpl implements ProductService {
+
+					//  method implementation
+
+				}
+
+---------------------------------------------------------------------------------
+								Thymeleaf
+
+	provides suppoort for HTML5/XHTML
+
+	> index.html in main> resources > static > templates
+
+	> getting data:
+	<script>
+		$(document).ready(function(){
+			$.getJSON("http://localhost:9090/products", function(result){
+				$.each(result, function(key,value) {
+				 $("#productsJson").append(value.id+" "+value.name+" ");
+				});
+			});
+		});
+</script>
+
+--------------------------------------------------------------------------------
+								CORS Support
+
+	1. @CrossOrigin(origins = "http://localhost:8080")  -- on method
+	2. cors configuration
+	3. @CrossOrigin(origins = "*",methods=[...])        -- on controller
+
+--------------------------------------------------------------------------------
+								Scheduling 
+
+	- executing tasks for the specific time period.
+
+	- @EnableScheduling
+	- @Scheculed(cron= " 0*9** ? ")
+	- @Scheduled(fixedRate = 1000,initialDelay = 1000)
+ 
+
+	>	@Scheduled(cron= " 0*9** ? ")
+		public void cronJobSch() throws Exception{ ... }
+
+--------------------------------------------------------------------------------
+						Eureka Server -(Discovery server)
+
+	-  Eureka Server is an application that holds the information about all client-service applications
+	-  Every Micro service will register into the Eureka server and Eureka server knows all the client applications running on each port and IP address.
+
+	- present in Spring Cloud package
+
+	> @EnableEurekaServer 
+	>  
+	<dependency>
+		<groupId>org.springframework.cloud</groupId>
+		<artifactId>spring-cloud-starter-eureka-server</artifactId>
+	</dependency>
+	>
+		eureka.client.registerWithEureka=false
+		eureka.client.fetchRegistry=false
+		server.port=8761
+		
+------------------------– Service Registration with Eureka ----------------------
+
+	> @EnableEurekaClient
+	> properties:
+		eureka.client.serviceUrl.defaultZone = http://localhost:8761/eureka
+		eureka.client.instance.preferIpAddress = true
+		spring.application.name = eurekaclient1
+
+----------------------------------------------------------------------------------
+
+							Zuul Proxy server and Routing
+
+	- application gateway and dynamic routing 
+
+	- Zuul Server is bundled with Spring Cloud dependency
+
+	> @EnableZuulProxy
+	> properties :
+					spring.application.name=zuulserver
+					zuul.routes.products.path=/api/demo/**
+					zuul.routes.products.url=http://localhost:8080/
+					server.port=8111
+
+---------------------------------------------------------------------------------
+
+						Spring Cloud Configuration Server
+	- Spring Cloud Configuration Server is a centralized application that manages all the application related configuration properties. 
+
+	> @EnableConfigServer
+	>
+		spring.cloud.config.server.native.searchLocations=file:///C:/configprop/
+		SPRING_PROFILES_ACTIVE=native
+
+	>Now, in file:///C:/configprop/, 
+	place your client application - application.properties file.
+
+	For example, your client application name is config-client, then rename your
+	application.properties file as config-client.properties and place the properties file on the path file:///C:/configprop/. 
+
+	> hit URL: http://localhost:8888/config-client/default/master
+
+
+----------------------------------------------------------------------------------
+
+							Actuators 
+
+	- provides secured endpoints for monitoring and managing your application.
+
+	<dependency>
+		 <groupId>org.springframework.boot</groupId>
+		 <artifactId>spring-boot-starter-actuator</artifactId>
+	</dependency>
+
+	>properties file : management.security.enabled=false
+
+	>   new Endpoints :
+
+			1. /metrics -- shows memory used,memory free,threads,classes,uptim.
+			2. /env
+			3. /beans
+			4. /health
+			5. /info
+			6. /trace
+---------------------------------------------------------------------------------
+
+							Admin server 
+	- used in microservices
+	- we can see the actuator endpoints of admin client application.
+
+	<dependency>
+		 <groupId>de.codecentric</groupId>
+		 <artifactId>spring-boot-admin-server</artifactId>
+		 <version>1.5.5</version>
+	</dependency>
+
+	<dependency>
+		 <groupId>de.codecentric</groupId>
+		 <artifactId>spring-boot-admin-server-ui</artifactId>
+		 <version>1.5.5</version>
+	</dependency>
+
+	> @EnableAdminServer
+
+
+						Admin Client
+
+	 properties : spring.boot.admin.url=http://localhost:9090/
+
+---------------------------------------------------------------------------------
+				
+							Spring For Apache Kafka
+
+	<dependency>
+		 <groupId>org.springframework.kafka</groupId>
+		 <artifactId>spring-kafka</artifactId>
+		 <version>2.1.0.RELEASE</version>
+	</dependency>
+
+	1. Producing Message : 
+
+	@Configuration
+	public class KafkaProducerConfig {
+		@Bean
+		public ProducerFactory<String, String> producerFactory() {
+			Map<String, Object> configProps = new HashMap<>();
+			configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+			"localhost:9092");
+			configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+			StringSerializer.class);
+			configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+			StringSerializer.class);
+			return new DefaultKafkaProducerFactory<>(configProps);
+		}
+		@Bean
+		public KafkaTemplate<String, String> kafkaTemplate() {
+			return new KafkaTemplate<>(producerFactory());
+		}
+	}
+
+	2. To publish a message
+
+	@Autowired
+	private KafkaTemplate<String, String> kafkaTemplate;
+
+	public void sendMessage(String msg) {
+		kafkaTemplate.send(topicName, msg);
+	}
+
+	3. Consuming a Message
+
+	@EnableKafka
+	@Configuration
+	public class KafkaConsumerConfig {
+		@Bean
+		public ConsumerFactory<String, String> consumerFactory() {
+			Map<String, Object> props = new HashMap<>();
+			props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
+			"localhost:2181");
+			props.put(ConsumerConfig.GROUP_ID_CONFIG, "group-id");
+			props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+			StringDeserializer.class);
+			props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+			StringDeserializer.class);
+			return new DefaultKafkaConsumerFactory<>(props);
+		}
+		@Bean
+		public ConcurrentKafkaListenerContainerFactory<String, String>
+			kafkaListenerContainerFactory() {
+			ConcurrentKafkaListenerContainerFactory<String, String> factory =
+			new ConcurrentKafkaListenerContainerFactory<>();
+			factory.setConsumerFactory(consumerFactory());
+			return factory;
+		}
+	}
+
+	4. Listener to listen to the messages.
+
+	@KafkaListener(topics = "tutorialspoint", groupId = "group-id")
+	public void listen(String message) {
+		System.out.println("Received Messasge in group - group-id: " +message);
+	}
+
+	5. Let us call the sendMessage() method from ApplicationRunner class run method from the main Spring Boot application class file and consume the message from the same class file.
+
+	@SpringBootApplication
+	public class KafkaDemoApplication implements ApplicationRunner {
+		@Autowired
+		private KafkaTemplate<String, String> kafkaTemplate;
+
+		public void sendMessage(String msg) {
+			kafkaTemplate.send("tutorialspoint", msg);
+		}
+		public static void main(String[] args) {
+			SpringApplication.run(KafkaDemoApplication.class, args);
+		}
+
+		@KafkaListener(topics = "tutorialspoint", groupId = "group-id")
+		public void listen(String message) {
+			System.out.println("Received Messasge in- group-id: " +message);
+		}
+
+		@Override
+		public void run(ApplicationArguments args) throws Exception {
+			sendMessage("Hi Welcome to Spring For Apache Kafka");
+		}
+	}
+
+
+----------------------------------------------------------------------------------
+								Twilio
+
+		- to send the SMS and make voice calls programmatically
+
+		<dependency>
+			 <groupId>com.twilio.sdk</groupId>
+			 <artifactId>twilio</artifactId>
+			 <version>7.16.1</version>
+		</dependency>
+
+		static {
+			Twilio.init(ACCOUNT_SID, AUTH_ID);
+		}
+
+---------------------------------------------------------------------------------
+
+
+
+

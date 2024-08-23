@@ -1,0 +1,87 @@
+
+---------------------------------------------
+
+modern ORMs encapsulate techniques like eager loading and update batching that are complicated to implement in hand-coded data access layers.
+
+Caching – first level
+Caching – Second level
+Compiled Queries
+
+classic optimisation tricks:
+
+	prepared statements (most of ORM implicitely use them by default)
+	first and second-level caches
+	"write first, optimize later"
+	it is possible to switch off ORM and send SQL commands directly to the database for very frequent, specialized and costly requests
+
+
+From the point of developer, there are following optimization cases he must deal with:
+
+Reduce chattiness between ORM and DB. Low chatiness is important, since each roundtrip between ORM and database implies network interaction, and thus its length varies between 0.1 and 1ms at least - independently of query complxity (note that may be 90% of queries are normally fairly simple). Particular case is SELECT N+1 problem: if processing of each row of some query result requires an additional query to be executed (so 1 + count(...) queries are executed at total), developer must try to rewrite the code in such a way that nearly constant count of queries is executed. CRUD sequence batching and future queries are other examples of optimization reducing the chattines (described below).
+Reduce query complexity. Usually ORM is helpless here, so this is solely a developer's headache. But APIs allowing to execute SQL commands directly are frequently intended to be used also in this case.
+So I can enlist few more optimizations:
+
+Future queries: an API allowing to delay an execution of query until the moment when its result will be necessary. If there are several future queries scheduled at this moment, they're executed alltogether as a single batch. So the main benefit of this is reduction of # of roundtrip to database (= reduction of chattiness between ORM and DB). Many ORMs implement this, e.g. NHibernate.
+CRUD sequence batching: nearly the same, but when INSERT, UPDATE and DELETE statements are batched together to reduce the chattines. Again, implemented by many ORM tools.
+Combination of above two cases - so-called "generalized batching". AFAIK, so far this is implemented only by DataObjects.Net (the ORM my team works on).
+Asynchronous generalized batching: if batch requires no immediate reply, it is executed asynchronously (but certainly, in sync with other batches sent by the same session, i.e. underlying connection is anyway used synchronously). Brings noticeable benefits when there are lots of CRUD statements: the code modifying persistent entities is executed in parallel with DB-side operation. AFAIK, no ORM implements this optimization so far.
+All these cases fit under "write first, optimize later" rule (or "express intention first, optimize later").
+
+Another well-known optimization-related API is prefetch API ("Prefetch paths"). The idea behind is to fetch a graph of objects that is expected to be processed further with minimal count of queries (or, better, in minimal time). So this API addresses "SELECT N+1" problem. Again, this part is normally expected to be implemented in any serious ORM product.
+
+All above optimizations are safe from the point of transaction isolation - i.e. they don't break it. Caching-related optimizations normally aren't safe from this point: you must carefully configure caching to ensure you won't get stale objects when getting actual content is important (e.g. on security checks or on some real-time interaction). There are lots of techniques here, starting from usage of built-in caches in finishing with integration with distributed caches (memcached, etc.). Any approach solving the problem is good here; personally I would expect an open API allowing to integrate any with cache I prefer.
+
+-----
+
+Optimization #1 - Agent
+EclipseLink implements LAZY for OneToOne and ManyToOne relationships using byte code weaving. EclipseLink also uses weaving to perform many other optimizations, such as change tracking and fetch groups. The JPA specification provides the hooks for weaving in EJB 3 compliant application servers, but in Java SE or other application servers weaving is not performed by default. To enable EclipseLink weaving in Java SE for this example the EclipseLink agent is used. This is done using the Java -javaagent:eclipselink.jar option. If dynamic weaving is unavailable in your environment, another option is to use static weaving, for which EclipseLink provides an ant task and command line utility.
+
+Optimization #2 - Pagination
+In theory at some point you should run out of memory by bringing the entire database into memory in a single persistence context. So next I increased the size to 1 million objects, and this gave the expect out of memory error. Interestingly this was with only using a heap size of 512 meg. If I had used the entire 8 gigs of RAM, I could, in theory, have persisted around 16 million objects in a single persistence context. If I gave the virtualized machine the full 98 gigs of RAM available on the server, perhaps it would even be possible to persist 100 millions objects. Perhaps we are beyond the day when it does not make sense to pull an entire database into RAM, and perhaps this is no longer such as crazy thing to do. But, for now, lets assume it is an idiotic thing to do, so how can we avoid this?
+
+JPA provides a pagination feature that allows a subset of a query to be read. This is supported in JPA in the Query setFirstResult,setMaxResults API. So instead of reading the entire database in one query, the objects will be read page by page, and each page will be persisted in its own persistence context and transaction. This avoids ever having to read the entire database, and also should, in theory, make the persistence context more optimized by reducing the number of objects it needs to process together.
+
+Switching to using pagination is relatively easy to do for the original orders query, but some issues crop up with the relationship to Customer. Since orders can share the same customer, it is important that each order does not insert a new customer, but uses the existing customer. If the customer for the order was already persisted on a previous page, then the existing one must be used. This requires the usage of a query to find the matching customer in the new database, which introduces some performance issues we will discuss later.
+
+
+
+Query Cache
+This will introduce a lot of queries for customer by name (10,000 to be exact), one for each order. This is not very efficient, and can be improved through caching. In EclipseLink there is both an object cache and a query cache. The object cache is enabled by default, but objects are only cached by Id, so this does not help us on the query using the customer's name. So, we can enable a query cache for this query. A query cache is specific to the query, and caches the query results keyed on the query name and its parameters. A query cache is enabled in EclipseLink through using the query hint "eclipselink.query-results-cache"="true". This should be set where the query is defined, in this case in the orm.xml. This will reduce the number of queries for customer to 1,000, which is much better.
+
+There are other solutions to using the query cache. EclipseLink also supports in-memory querying. In-memory querying means evaluating the query on all of the objects in the object cache, instead of accessing the database. In-memory querying is enabled through the query hint "eclipselink.cache-usage"="CheckCacheOnly". If you enabled a full cache on customer, then as you persisted the orders all of the existing customers would be in the cache, and you would never need to access the database. Another manual solution is to maintain a Map in the migration code keying the new customer's by name. For all of the above solutions if the cache is made fixed sized (query cache defaults to a size of 100), you would never need all of the customers in memory at the same time, so there would be no memory issues.
+
+Optimization #4 - Batch Fetch
+The most common performance issue in JPA is in the fetch of relationships. If you query n orders, and access their order-lines, you get n queries for order-line. This can be optimized through join fetching and batch fetching. Join fetching, joins the relationship in the original query and selects from both tables. Batch fetch executes a second query for the related objects, but fetches them all at once, instead of one by one. Because we are using pagination, this make optimizing the fetch a little more tricky. Join fetch which still work, but since order-lines is join fetched, and there are 10 order-lines per order, the page size that was 500 orders, in now only 50 orders (and their 500 order-lines). We can resolve this by increasing the page size to 5000, but given in a real application the number of order-lines in not fixed, this becomes a bit of a guess. But the page size was just a heuristic number anyway, so no real issue. Another issue with join fetching with pagination is the last and first object may not have all of its related objects, if it falls in-between a page. Fortunately EclipseLink is smart enough to handle this, but it does require 2 extra queries for the first and last order of each page. Join fetching also has the draw back that it is selecting more data when a OneToMany is join fetched. Join fetching is enable in JPQL using join fetch o.orderLine.
+
+Batch fetching normally works by joining the original query with the relationship query, but because the original query used pagination, this will not work. EclipseLink supports three types of batch fetching, JOIN, EXISTS, and IN. IN works with pagination, so we can use IN batch fetching. Batch fetch is enabled through the query hint "eclipselink.batch"="o.orderLines", and "eclipselink.batch.type"="IN". This will reduce the n queries for order-line to 1. So for each batch/page of 500 orders, there will be 1 query for the page of orders, and 1 query for the order-lines, and 50 queries for customer.
+
+Optimization #5 - Read Only
+The application is migrating from the MySQL database to the Oracle database. So is only reading from MySQL. When you execute a query in JPA, all of the resulting objects become managed as part of the current persistence context. This is wasteful in JPA, as managed objects are tracked for changes and registered with the persistence context. EclipseLink provides a "eclipselink.read-only"="true" query hint that allows the persistence context to be bypassed. This can be used for the migration, as the objects from MySQL will not be written back to MySQL.
+
+Optimization #6 - Sequence Pre-allocation
+We have optimized the first part of the application, reading from the MySQL database. The second part is to optimize the writing to Oracle.
+
+The biggest issue with the writing process is that the Id generation is using an allocation size of 1. This means that for every insert there will be an update and a select for the next sequence number. This is a major issue, as it is effectively doubling the amount of database access. By default JPA uses a pre-allocation size of 50 for TABLE and SEQUENCE Id generation, and 1 for IDENTITY Id generation (a very good reason to never use IDENTITY Id generation). But frequently applications are unnecessarily paranoid of holes in their Id values and set the pre-allocaiton value to 1. By changing the pre-allocation size from 1 to 500, we reduce about 1000 database accesses per page.
+
+Optimization #7 - Cascade Persist
+I must admit I intentionally added the next issue to the original code. Notice in the for loop persisting the orders, I also loop over the order-lines and persist them. This would be required if the order did not cascade the persist operation to order-line. However, I also made the orderLines relationship cascade, as well as order-line's order relationship. The JPA spec defines somewhat unusual semantics to its persist operation, requiring that the cascade persist be called every time persist is called, even if the object is an existing object. This makes cascading persist a potentially dangerous thing to do, as it could trigger a traversal of your entire object model on every persist call. This is an important point, and I added this issue purposefully to highlight this point, as it is a common mistake made in JPA applications. The cascade persists causes each persist call to order-line to persist its order, and every order-line of the order again. This results in an n^2 number of persist calls. Fortunately there are only 10 order-lines per order, so this only results in 100 extra persist calls per order. It could have been much worse if the customer defined a relationship back to its orders, then you would have 1000 extra calls per order. The persist does not need to do anything, as the objects are already persisted, but the traversal can be expensive. So, in JPA you should either mark your relationships cascade persist, or call persist in your code, but not both. In general I would recommend only cascading persist for logically dependent relationships (i.e. things that would also cascade remove).
+
+Optimization #8 - Batch Writing
+Many databases provide an optimization that allows a batch of write operations to be performed as a single database access. There is both parametrized and dynamic batch writing. For parametrized batch writing a single parametrized SQL statement can be executed with a batch of parameter vales instead of a single set of parameter values. This is very optimal as the SQL only needs to be executed once, and all of the data can be passed optimally to the database.
+
+Dynamic batch writing requires dynamic (non-parametrized) SQL that is batched into a single big statement and sent to the database all at once. The database then needs to process this huge string and execute each statement. This requires the database do a lot of work parsing the statement, so is no always optimal. It does reduce the database access, so if the database is remote or poorly connected with the application, this can result in an improvement.
+
+In general parametrized batch writing is much more optimal, and on Oracle it provides a huge benefit, where as dynamic does not. JDBC defines the API for batch writing, but not all JDBC drivers support it, some support the API but then execute the statements one by one, so it is important to test that your database supports the optimization before using it. In EclipseLink batch writing is enabled using the persistence unit property "eclipselink.jdbc.batch-writing"="JDBC".
+
+Another important aspect of using batch writing is that you must have the same SQL (DML actually) statement being executed in a grouped fashion in a single transaction. Some JPA providers do not order their DML, so you can end up ping-ponging between two statements such as the order insert and the order-line insert, making batch writing in-effective. Fortunately EclipseLink orders and groups its DML, so usage of batch writing reduces the database access from 500 order inserts and 5000 order-line inserts to 55 (default batch size is 100). We could increase the batch size using "eclipselink.jdbc.batch-writing.size", so increasing the batch size to 1000 reduces the database accesses to 6 per page.
+
+Optimization #9 - Statement caching
+Every time you execute an SQL statement, the database must parse that statement and execute it. Most of the time application executes the same set of SQL statements over and over. By using parametrized SQL and caching the prepared statement you can avoid the cost of having the database parse the statement.
+
+There are two levels of statement caching. One done on the database, and one done on the JDBC client. Most databases maintain a parse cache automatically, so you only need to use parametrized SQL to make use of it. Caching the statement on the JDBC client normally provides the bigger benefit, but requires some work. If your JPA provider is providing you with your JDBC connections, then it is responsible for statement caching. If you are using a DataSource, such as in an application server, then the DataSource is responsible for statement caching, and you must enable it in your DataSource config. In EclipseLink, when using EclipseLink's connection pooling, you can enable statement caching using the persistence unit property "eclipselink.jdbc.cache-statements"="true". EclipseLink uses parametrized SQL by default, so this does not need to be configured.
+
+Optimization #10 - Disabling Caching
+By default EclipseLink maintains a shared 2nd level object cache. This normally is a good thing, and improves read performance significantly. However, in our application we are only inserting into Oracle, and never reading, so there is no point to maintaining a shared cache. We can disable this using the EclipseLink persistence unit property "eclipselink.cache.shared.default"="false". However, we are reading customer, so we can enable caching for customer using, "eclipselink.cache.shared.Customer"="true".
+
+Optimization #11 - Other Optimizations
+EclipseLink provides several other more specific optimizations. I would not really recommend all of these in general as they are fairly minor, and have certain caveats, but they are useful in use cases such as migration where the process is well defined.

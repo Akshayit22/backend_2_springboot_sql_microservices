@@ -1,0 +1,56 @@
+
+Different small services
+
+-----------------------------------------------------------------
+
+Interaction between two services using Feign client:
+
+	ex. two service quiz and questions
+		if quiz service want data from questions.
+
+	In quize service :
+
+		- @EnableFeignClients : on main class
+
+		- make dto of Qustions, don't make it entity and no id field we dont want to store in db.
+
+		- make new service interface : QustionsClient
+
+		- use: @FeignClient(url = "http://localhost:8082",value = "Question-Client")
+
+		- give mapping for url requesting data:
+
+			@FeignClient(url = "http://localhost:8082",value = "Question-Client")
+			public interface QuestionClient {
+
+			    @GetMapping("/question/quiz/{quizId}")
+			    List<Question> getQuestionOfQuiz(@PathVariable Long quizId);
+			}
+
+		- we can use this method in service as:
+
+			List<Question> qs = questionClient.getQuestionOfQuiz(quiz.getId());
+
+
+
+----------------------------------------------------------------------------------------------
+
+				service resigtry : eureka
+Server :
+
+	> @EnableEurekaServer 
+
+	> spring.application.name=SERVICE_REGISTRY
+	  eureka.client.registerWithEureka=false
+	  eureka.client.fetchRegistry=false
+	  or
+	  eureka.client.register-with-eureka=false
+	  eureka.client.fetch-registry=false
+
+client :
+
+	> dependancy of eureka client
+
+	> 	eureka.client.serviceUrl.defaultZone = http://localhost:8761/eureka
+		eureka.client.instance.preferIpAddress = true
+		spring.application.name = eurekaclient1

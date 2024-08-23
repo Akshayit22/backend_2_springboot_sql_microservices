@@ -1,0 +1,269 @@
+/*--------------------------- Spring Data JPA ----------------------------*/
+			
+JPA  -  Java Persistence API
+	- ORM layer between code and JDBC layer.
+	- allows interaction betweeen POJO objects.
+
+	<dependency>
+	  <groupId>org.springframework.boot</groupId>
+	  <artifactId>spring-boot-starter-data-jpa</artifactId>
+	</dependency>
+
+-
+
+	@EnableJpaRepositories 
+	@EntityScan 
+	@Entities 
+
+-
+	datasource configurations :
+
+	H2 - 
+		spring.datasource.url=jdbc:h2:mem:songs
+
+	Mysql - 
+		spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
+		spring.datasource.username=postgres
+		spring.datasource.password=secret
+
+- Automatic Schema Generation : properties
+
+	spring.jpa.hibernate.ddl-auto=create
+
+- adds ";" character to terminate every command — making it SQL script-ready
+		
+		spring.jpa.properties.hibernate.hbm2ddl.delimiter=;
+
+- adds new lines to make more human-readable 
+
+		spring.jpa.properties.hibernate.format_sql=true
+
+-
+		spring.jpa.show-sql=true
+		logging.level.org.hibernate.type=trace
+
+
+-----------------------------------------------------------------------------
+
+--  @Table(name="REPOSONGS_SONG") --> name in database
+	public class songs            --> class name used in queries.
+
+--  entity name "Song" 
+				(expressing queries; ex.>> select s from Song s)
+
+-- @Column(name = "ID")
+   private int id;
+
+
+----------------------------------------------------------------------------
+	
+					Interacting with db from app
+
+EntityManager persist() : 
+	
+	private final EntityManager em;
+
+	public void create(Song song) {
+		em.persist(song);
+	}
+
+	public Song findById(int id) {
+  		return em.find(Song.class, id);
+	}
+
+	public boolean existsById(int id) {
+		return em.
+			createQuery(
+				"select count(s) from Song s where s.id=:id",
+				Number.class
+			)
+			.setParameter("id", id) 
+			.getSingleResult() 
+			.longValue()==1L; 
+	}
+
+---------------------------------------------------------------------------
+
+					Transactions
+
+	- @EnableTransaction
+
+	- @Transactional
+			-on class : each method will be assigned a transaction
+
+
+-> annotaion is same as :
+
+	tx = em.getTransaction();
+	try {
+		tx.begin();
+	} 
+	catch (RuntimeException ex) {
+		tx.setRollbackOnly();
+	} 
+	catch (Exception ex) { 
+	} 
+	finally {
+	  if (tx.getRollbackOnly()) {
+	  	tx.rollback();
+	  } else {
+	  	tx.commit();
+	  }
+	}
+
+
+--------------------------------------------------------------------------
+			
+					@Transactional Attributes
+
+
+    -> 1. Propagation : 
+
+    		- (default) REQUIRED  -- ( activate transaction )
+
+    		- SUPPORTS -- (lazily initites transaction)
+
+    		- MANDATORY -- (error if called without an active transaction)
+
+    		- REQUIRES_NEW -- (create new transaction)
+
+    		- NOT_SUPPORTED -- (nothing within method will honor tx)
+
+    		- NEVER -- (do not call with an active transaction)
+
+    		- NESTED -- (permits nested transactions to complete before 				returning to calling transaction )
+
+
+    -> 2. Isolation : 
+
+    		- location to assign JDBC connection isolation
+
+    -> 3. ReadOnly : 
+
+    		- default to false,
+
+    -> 4. Rollback defination :
+
+    		- when to implement non-standard rollback rules
+
+
+---------------------------------------------------------------------------------
+
+topics remaining :
+
+Hibernate Session & Hibernate Query Language (HQL)
+"Criteria API in Hibernate,Caching in Hibernate"
+Handling Inheritance in Hibernate
+Performance Optimization with ORMs
+
+
+--------------------------------------------------------------------------------
+
+Handling Inheritance in Hibernate
+
+			
+			@MappedSupperclass
+			class BaseEntity{ //common fields
+				
+				private Date createdAt;
+
+				private Date updatedAt;
+
+				private string createdBy;
+
+			}
+
+--
+
+			@EqualsAndHashCode(callSuper = true)
+			@SuperBuilder
+			@Entity
+			class SubEntitie1 extends BaseEntity  {
+				
+			}
+
+--
+			@EqualsAndHashCode(callSuper = true)
+			@SuperBuilder
+			@Entity
+			class SubEntitie2 extends BaseEntity  {
+				
+			}
+
+---------------------------------------------------------------------
+Inheritance Types: 
+	
+	1. Single Table Inheritance : 
+		all classes in the inheritance hierarchy are mapped to a single database table.
+
+	2. Joined Table Inheritance : 
+		mapping each class in the hierarchy to its own database table
+
+	3. Table per Class Hierarchy :
+		a single table is used to represent the entire class hierarchy
+		discriminator column is used to identify the type of each entity.
+		Ex. @DiscriminatorValue('V')
+
+	4. Table per Concrete Class : 
+		each concrete class in the hierarchy is mapped to its own database table
+
+Ex. base class Vehicle and two subclasses Car and Truck.
+
+1. Single Table Inheritance 
+
+		@Table("vehicles")
+		public abstract class Vehicle {
+		    @Id
+		    private Long id;
+		    private String manufacturer;
+		}
+
+		-- class Car extends Vehicle
+		-- class Truck extends Vehicle
+		-- repo :
+					interface VehicleRepository 
+							extends ReactiveCrudRepository
+								<Vehicle, Long>{}
+
+2. Joined Table Inheritance 
+
+
+
+
+Ex.  class Resource -- 
+							base classes - :  1. file  2. video  3. audio
+
+
+
+			@Inheritance( strategy = InheritanceType.TABLE_PER_CLASS)
+			class resource {
+
+			}
+
+
+
+----------------------------------------------------------------------------
+
+Combined Key :
+
+	
+	@Embeddable
+	class OrderId implements Serializable{
+
+			private String username;
+
+			private Date OrderDate;
+	}
+
+
+	@EmbeddedId
+	class Orders extends OrderId {
+
+
+			private string OrderInfo;
+
+	}
+
+
+
+

@@ -1,0 +1,179 @@
+
+Testing with Mockito 
+
+---------------------------- Data access layer test -------------------------------
+
+@DataJpaTest
+@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
+public class RepositoryTests {
+
+	@Autowired
+	private UserRepo userRepo;
+	
+	
+	private User userObj = null;
+
+	@BeforeAll
+	public static void beforeAll() {
+		System.out.println("@Before All..");
+	}
+
+	@BeforeEach
+	void setUp() {
+		System.out.println("@BeforeEach..");
+		
+		User user = new User(); // user builder instead
+		user.setEmail("random@Email.com");
+		user.setFname("Random");
+		user.setLname("Random");
+		user.setPassword("Big Password");
+		userObj = userRepo.save(user);
+	}
+
+	@AfterEach
+	void tearDown() {
+		System.out.println("@AfterEach..");
+	}
+
+	@Test
+	public void userRepo_save() {
+		System.out.println("userRepo_save");
+		/*
+		 * // Arrange User user = new User(); // user builder instead
+		 * 
+		 * user.setEmail("random@Email.com"); user.setFname("Random");
+		 * user.setLname("Random"); user.setPassword("Big Password");
+		 * 
+		 * // Act User user2 = userRepo.save(user);
+		 */
+
+		// Assert
+
+		Assertions.assertThat(userObj).isNotNull();
+
+		Assertions.assertThat(userObj.getId()).isGreaterThanOrEqualTo(0);
+	}
+
+	@Test
+	public void find_by_type_test() {
+		System.out.println("find_by_type_test");
+
+//		User user = new User(); // user builder instead
+//		
+//		user.setEmail("random@Email.com");
+//		user.setFname("Random"); user.setLname("Random");
+//		user.setPassword("Big Password");
+//		
+//		//Act 
+//		User user2 = userRepo.save(user);
+
+		User user3 = userRepo.findOneByEmail(userObj.getEmail());
+
+		Assertions.assertThat(user3).isNotNull();
+
+	}
+
+	@Test
+	public void delete_user_test() {
+		System.out.println("Deleting user test..");
+
+		userRepo.delete(userObj);
+
+		User u = userRepo.findOneByEmail("random@Email.com");
+
+		Assertions.assertThat(u).isNull();
+
+	}
+
+	
+}
+
+
+
+---------------------------------- Service layer tests -------------------------------------------------------
+
+
+@ExtendWith(MockitoExtension.class)
+public class UserServiceTest {
+	
+	@Mock
+	private UserRepo userRepo;
+	
+	@InjectMocks
+	private UserServices service; 
+	
+	@Test
+	public void create_user_test_null_check() {
+		System.out.println("create_user_test_null_check");
+		assertThrows(NullPointerException.class, ()-> service.createUser(null));
+	}
+	
+	@Test
+	public void create_user_test() {
+		System.out.println("create_user_test");
+		User user = new User(); // user builder instead
+		user.setEmail("random@Email.com");
+		user.setFname("Random");
+		user.setLname("Random");
+		user.setPassword("Big Password");
+		
+		//User user1 = userRepo.save(user);
+		//Mockito.when(null);
+		
+		when(userRepo.save(user)).thenReturn(user);
+		
+		User user2 = service.createUser(user);
+		
+		Assertions.assertThat(user2).isNotNull();
+		System.out.println(user2.getId());
+		
+		verify(userRepo,times(1)).save(user);
+		
+		
+	}
+
+}
+
+
+
+
+
+------------------------- controller tests ---------------------------------
+
+@WebMvcTest(controllers = UserController.class)
+@AutoConfigureMockMvc(addFilters = false)
+@ExtendWith(MockitoExtension.class)
+public class UserControllerTest {
+	
+	@Autowired
+	private MockMvc mockMvc;
+	
+	private UserServices userServices;
+	
+	@BeforeEach
+	void setUp() {
+		userServices = Mockito.mock(UserServices.class);
+	}
+	
+	
+	@Test
+	public void getAllUsers_controller_test() throws Exception {
+//		
+//		ResultActions respActions = mockMvc.perform(get("/api/v1/user")
+//				.contentType(MediaType.APPLICATION_JSON)
+//				.content())
+		
+	}
+	
+	
+	
+}
+
+
+------------------------------------------------------------------------------------------
+
+
+	 > can use Jococo as code coverage tool.
+
+	 > sonarQube for code quality.
+

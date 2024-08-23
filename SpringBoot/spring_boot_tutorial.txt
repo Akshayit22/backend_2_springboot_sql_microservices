@@ -7,24 +7,30 @@ Topics to recap:
 	Spring Boot RESTful Web Services
 	Spring Boot Security (Authentication and Authorization)
 
+completed :
 	Spring Boot Data Access with JPA and Hibernate
 	Model Binding and Validation
+	Working with Databases and ORM (Object-Relational Mapping) -Hibernate
+	
+	Entity Mapping with Hibernate and Transaction Management
+	Hibernate Session & Hibernate Query Language (HQL)
+	"Criteria API in Hibernate,Caching in Hibernate"
+	Handling Inheritance in Hibernate
+	Performance Optimization with ORMs
+
+remain: 
+	Spring Boot Microservices
+	
 
 ------------------------------------
 New Topics to learn :
 
 	
-	Spring Boot Microservices
-	Working with Databases and ORM (Object-Relational Mapping) -Hibernate
-	"Entity Mapping with Hibernate,Hibernate Session and Transaction Management,Hibernate Query Language (HQL)"
-	"Criteria API in Hibernate,Caching in Hibernate"
-	Handling Inheritance in Hibernate
-	Performance Optimization with ORMs
+	
 	"JUnit Framework Basics,Mocking Dependencies with Mockito"
 	Testing Data Access with Spring Boot
 	Code Coverage Tools
 	Deployment and hosting
-
 
 ----------------------------------------------------------------------------------
 
@@ -394,66 +400,6 @@ Good Practice :
 	>	@Scheduled(cron= " 0*9** ? ")
 		public void cronJobSch() throws Exception{ ... }
 
---------------------------------------------------------------------------------
-						Eureka Server -(Discovery server)
-
-	-  Eureka Server is an application that holds the information about all client-service applications
-	-  Every Micro service will register into the Eureka server and Eureka server knows all the client applications running on each port and IP address.
-
-	- present in Spring Cloud package
-
-	> @EnableEurekaServer 
-	>  
-	<dependency>
-		<groupId>org.springframework.cloud</groupId>
-		<artifactId>spring-cloud-starter-eureka-server</artifactId>
-	</dependency>
-	>
-		eureka.client.registerWithEureka=false
-		eureka.client.fetchRegistry=false
-		server.port=8761
-		
-------------------------– Service Registration with Eureka ----------------------
-
-	> @EnableEurekaClient
-	> properties:
-		eureka.client.serviceUrl.defaultZone = http://localhost:8761/eureka
-		eureka.client.instance.preferIpAddress = true
-		spring.application.name = eurekaclient1
-
-----------------------------------------------------------------------------------
-
-							Zuul Proxy server and Routing
-
-	- application gateway and dynamic routing 
-
-	- Zuul Server is bundled with Spring Cloud dependency
-
-	> @EnableZuulProxy
-	> properties :
-					spring.application.name=zuulserver
-					zuul.routes.products.path=/api/demo/**
-					zuul.routes.products.url=http://localhost:8080/
-					server.port=8111
-
----------------------------------------------------------------------------------
-
-						Spring Cloud Configuration Server
-	- Spring Cloud Configuration Server is a centralized application that manages all the application related configuration properties. 
-
-	> @EnableConfigServer
-	>
-		spring.cloud.config.server.native.searchLocations=file:///C:/configprop/
-		SPRING_PROFILES_ACTIVE=native
-
-	>Now, in file:///C:/configprop/, 
-	place your client application - application.properties file.
-
-	For example, your client application name is config-client, then rename your
-	application.properties file as config-client.properties and place the properties file on the path file:///C:/configprop/. 
-
-	> hit URL: http://localhost:8888/config-client/default/master
-
 
 ----------------------------------------------------------------------------------
 
@@ -476,148 +422,3 @@ Good Practice :
 			4. /health
 			5. /info
 			6. /trace
----------------------------------------------------------------------------------
-
-							Admin server 
-	- used in microservices
-	- we can see the actuator endpoints of admin client application.
-
-	<dependency>
-		 <groupId>de.codecentric</groupId>
-		 <artifactId>spring-boot-admin-server</artifactId>
-		 <version>1.5.5</version>
-	</dependency>
-
-	<dependency>
-		 <groupId>de.codecentric</groupId>
-		 <artifactId>spring-boot-admin-server-ui</artifactId>
-		 <version>1.5.5</version>
-	</dependency>
-
-	> @EnableAdminServer
-
-
-						Admin Client
-
-	 properties : spring.boot.admin.url=http://localhost:9090/
-
----------------------------------------------------------------------------------
-				
-							Spring For Apache Kafka
-
-	<dependency>
-		 <groupId>org.springframework.kafka</groupId>
-		 <artifactId>spring-kafka</artifactId>
-		 <version>2.1.0.RELEASE</version>
-	</dependency>
-
-	1. Producing Message : 
-
-	@Configuration
-	public class KafkaProducerConfig {
-		@Bean
-		public ProducerFactory<String, String> producerFactory() {
-			Map<String, Object> configProps = new HashMap<>();
-			configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
-			"localhost:9092");
-			configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-			StringSerializer.class);
-			configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-			StringSerializer.class);
-			return new DefaultKafkaProducerFactory<>(configProps);
-		}
-		@Bean
-		public KafkaTemplate<String, String> kafkaTemplate() {
-			return new KafkaTemplate<>(producerFactory());
-		}
-	}
-
-	2. To publish a message
-
-	@Autowired
-	private KafkaTemplate<String, String> kafkaTemplate;
-
-	public void sendMessage(String msg) {
-		kafkaTemplate.send(topicName, msg);
-	}
-
-	3. Consuming a Message
-
-	@EnableKafka
-	@Configuration
-	public class KafkaConsumerConfig {
-		@Bean
-		public ConsumerFactory<String, String> consumerFactory() {
-			Map<String, Object> props = new HashMap<>();
-			props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
-			"localhost:2181");
-			props.put(ConsumerConfig.GROUP_ID_CONFIG, "group-id");
-			props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
-			StringDeserializer.class);
-			props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-			StringDeserializer.class);
-			return new DefaultKafkaConsumerFactory<>(props);
-		}
-		@Bean
-		public ConcurrentKafkaListenerContainerFactory<String, String>
-			kafkaListenerContainerFactory() {
-			ConcurrentKafkaListenerContainerFactory<String, String> factory =
-			new ConcurrentKafkaListenerContainerFactory<>();
-			factory.setConsumerFactory(consumerFactory());
-			return factory;
-		}
-	}
-
-	4. Listener to listen to the messages.
-
-	@KafkaListener(topics = "tutorialspoint", groupId = "group-id")
-	public void listen(String message) {
-		System.out.println("Received Messasge in group - group-id: " +message);
-	}
-
-	5. Let us call the sendMessage() method from ApplicationRunner class run method from the main Spring Boot application class file and consume the message from the same class file.
-
-	@SpringBootApplication
-	public class KafkaDemoApplication implements ApplicationRunner {
-		@Autowired
-		private KafkaTemplate<String, String> kafkaTemplate;
-
-		public void sendMessage(String msg) {
-			kafkaTemplate.send("tutorialspoint", msg);
-		}
-		public static void main(String[] args) {
-			SpringApplication.run(KafkaDemoApplication.class, args);
-		}
-
-		@KafkaListener(topics = "tutorialspoint", groupId = "group-id")
-		public void listen(String message) {
-			System.out.println("Received Messasge in- group-id: " +message);
-		}
-
-		@Override
-		public void run(ApplicationArguments args) throws Exception {
-			sendMessage("Hi Welcome to Spring For Apache Kafka");
-		}
-	}
-
-
-----------------------------------------------------------------------------------
-								Twilio
-
-		- to send the SMS and make voice calls programmatically
-
-		<dependency>
-			 <groupId>com.twilio.sdk</groupId>
-			 <artifactId>twilio</artifactId>
-			 <version>7.16.1</version>
-		</dependency>
-
-		static {
-			Twilio.init(ACCOUNT_SID, AUTH_ID);
-		}
-
----------------------------------------------------------------------------------
-
-
-
-

@@ -1,0 +1,16 @@
+# media queries : 
+	different properties for different screen size
+
+	@media(max-Width:400px){
+		.container{
+			grid-gap: 50px;
+		}
+	} 
+
+	two condition : 
+	@media((min-width:400px) and (max-width:800px)){
+	
+	}
+
+# Nested grid: 
+	

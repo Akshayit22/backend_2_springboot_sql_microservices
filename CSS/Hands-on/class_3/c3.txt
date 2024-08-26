@@ -1,0 +1,9 @@
+# position 
+	1. static : default --> as written by ordering
+	2. reletive :  --> relative to its normal position
+	3. fixed :  --> fixed respect to viewport
+	4. Absolute --> relative to the position of nearest() parent element
+	5. sticky : --> we toggele between relative and fixed 
+
+# 3D trnasform css:
+	

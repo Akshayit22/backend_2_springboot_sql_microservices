@@ -1,7 +1,7 @@
 Topics :
-
-	- Display (inline, block, inline-block)
-	- Float
+	- Specificity
+	- Display (inline, block, inline-block,none,flex,grid)
+	- Float   (left,rigth,none,inline-start/end)
 	- Flex
 	"Default Styles, Positioning, Navigation Bar, Website Layout, Dropdowns, Selectors, CSS Functions"
 	Intro to Scss and basics
@@ -10,3 +10,65 @@ Topics :
 	Mini-Project - LinkedIn/ FB/ Insta Clone
 	"Overview of CSS Frameworks, with intro to Tailwind etc"
 	"Assignments: https://flexboxfroggy.com/, https://flukeout.github.io/"
+
+
+---------------------------------------------------------------------------------------------
+
+# specificity --> specifie whice property to select
+
+	high ---> low
+
+	1. style attribute (inline) --> 2. ID selector --> 3. class, pseudo class, --> 4.element p{}
+
+
+# Display (inline, block, inline-block): 
+
+
+
+# Units in css : 
+	px : css 1px is 1/96 inch it is different from hardware pixel
+	mm :
+	cm : 
+	in : 
+
+	% unit : 10% of parents width/hight
+
+	relative: 
+		em : relative to parent element font size
+		rem : relative to rootel ement
+
+	vw : 1/100 times width of view port
+	vh : 1/100 times hight of view port
+
+# css shadow effect  : 
+
+	1. text shadow :
+	  	text-shadow: 3px 3px 3px yellow;
+			         x    y  blur  color
+
+	2. box shadow :
+		box-shadow: 10px 10px 5px green;
+	
+# css dimension properties :
+	min-height , max-height ,min-width  ,min-width  
+
+
+# overflow : scroll hidden visible auto
+
+# position 
+	1. static : default --> as written by ordering (normal flow)
+
+	2. reletive : positioned normal flow then offset relative to `itself` is aaded by top,left,bottom 
+
+	3. fixed : removed from normal flow and positioned relative to its initial containing block of viewport
+
+	4. Absolute : removed from normal flow and positioned relative to closest parent container
+
+	5. sticky : positioned normal flow and offset relative to nearest scrolling ancestor added.
+
+
+# flex :
+	
+		display: flex;
+	justify-content: center;
+	align-items: center;

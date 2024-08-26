@@ -1,0 +1,34 @@
+# flex box : 
+	layout model ,
+	we can manage space distribution and alignment capability
+
+
+	# flex-Container properties: 
+		display: flex; --> by default main horizontal axis 
+		flex-direction: row / coloumn;
+
+		flex-wrap: wrap; --> to preserve width , item get on next line 
+
+		flex-flow: row wrap ;  --> both flex direction and wrap in one line
+
+		justify-content:center; : --> align item acco. to main axis (x-axis)
+
+		align-items: center;  --> align item acco. to vertical/cross axis (y-axis)
+
+		align-content: center;  --> spacing between row of items/content
+
+	
+	# flex-Items properties :
+
+		order:1; -->
+
+		flex-grow:  1; --> width
+
+		flex-shrink: 4; ---> for particular item to shrink
+
+		flex-basis: 50px;  --> content responsive
+
+		flex : flex:3 grow:2 shrink:4 basis:300px;
+
+		align-self: ---> only one item aling
+		

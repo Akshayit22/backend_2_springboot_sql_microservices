@@ -1,0 +1,43 @@
+.cls{
+	background-color:darkturquoise;
+	font-size:large;
+	font-weight: 100;
+	font-family: 'Times New Roman', Times, serif;
+	width: 200px;
+	box-shadow: 10px 10px 5px red;
+}
+
+h1{
+	text-shadow: 3px 3px 3px yellow;
+	text-shadow: 3px 3px 3px red,50px 5px 10px green;
+}
+
+.linear{
+	height: 200px;
+	width: 500px;
+	border: 1px solid black;
+
+	background-image: linear-gradient(red,blue);
+	background-image: linear-gradient(to right,red,blue);
+	background-image: linear-gradient(to left,red,blue);
+	background-image: linear-gradient(to bottom right,red,blue,green);
+	background-image: linear-gradient(-45deg,red,blue,green);
+}
+
+.radial{
+	height: 200px;
+	width: 500px;
+	border: 1px solid black;
+
+	background-image: radial-gradient(circle,red,yellow);
+	background-image: radial-gradient(red 20%,yellow 30% , blue 60%);
+}
+
+.flag{
+	height: 200px;
+	width: 400px;
+	border: 1px solid black;
+
+	background-image: linear-gradient(orange,white,green);
+
+}

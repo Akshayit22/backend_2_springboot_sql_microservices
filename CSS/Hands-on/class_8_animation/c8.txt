@@ -1,0 +1,64 @@
+# variable : 
+	only used under box (local variable): 
+	
+		.c{
+
+			--dark-red: #981a2c;
+
+			color:var(--dark-red);
+		}
+
+	everywhere in style (global scope):
+
+		:root{
+			--dark-red:#981a2c;
+		}
+
+		.c22{
+			color:var(--dark-red);
+		}
+
+
+# Animation : 
+	1. css transition : 
+		transition-property :all / background-color;
+
+		transition-delay :2s;
+
+		transition : property  duration  tran-function  tran-delay;
+
+			tran-function : ease-in , ease-out
+
+
+	2. Animation & keyFrames : 
+
+		.container{
+
+			animation-name : aks;
+			animation-duration:3s;
+			animation-iteration-count:5;
+			animation-timing-function: ease;
+			animation-direction : alternate;
+			animation-delay:1s;
+
+			animation-fill-mode : forware / backword / both ;
+
+			
+		}
+
+		@keyframes aks{
+			from{
+				width:212px;
+			}
+			to{
+				width:100%;
+			}
+
+			30% animation done:
+			30%{
+
+			}
+			100%{
+
+			}
+		}

@@ -1,0 +1,26 @@
+# CSS GRID :
+	Two diamensional (2D) layout with rows and columns
+
+	.container{
+		background-color: blueviolet;
+		height: 500px;
+		display: grid;
+		grid-template-columns: 200px 200px 210px;
+		grid-template-rows: 90px 90px 90px 90px;
+	}
+
+	grid-template-columns: 1fr 1fr 1fr; ===> grid-template-columns: repeat(3,1fr);
+
+	grid-template-columns: 100px repeat(3,1fr) 200px;
+					       first  mid three    last
+					       col    cols          col
+
+	flexible grid : 
+		grid-template-columns: repeat(3,1fr);
+		grid-template-rows: repeat(4,1fr);
+
+	col span : 
+		#b1{
+			grid-column-start: 1;
+			grid-column-end:3;
+		}

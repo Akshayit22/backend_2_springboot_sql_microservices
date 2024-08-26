@@ -1,0 +1,85 @@
+# CSS GRID :
+	Two diamensional (2D) layout with rows and columns
+
+	.container{
+		background-color: blueviolet;
+		height: 500px;
+		display: grid;
+		grid-template-columns: 200px 200px 210px;
+		grid-template-rows: 90px 90px 90px 90px;
+	}
+
+	grid-template-columns: 1fr 1fr 1fr; ===> grid-template-columns: repeat(3,1fr);
+
+	grid-template-columns: 100px repeat(3,1fr) 200px;
+			       first  mid three    last
+			       col    cols          col
+
+	flexible grid : 
+		grid-template-columns: repeat(3,1fr);
+		grid-template-rows: repeat(4,1fr);
+
+	col span : 
+		#b1{
+			grid-column-start: 1;  
+			grid-column-end:3;
+		}
+		1, 3 ---> are line number which is in between grid col & rows
+
+	# grid area :
+
+		#b1{
+			grid-area: 1/1/3/4;
+		}
+		
+		grid-area: 1/1/3/4; -->
+			row start / col start / row end / col end
+
+	# grid template area :
+		give name to col and rows
+		.container{
+			grid-template-columns: 200px 400px;
+			grid-template-rows: 30px 500px 30px;
+
+			grid-template-areas: 
+			"hd hd"
+			"side cont"
+			"ft ft";
+		}
+		#header{
+			grid-area: hd;
+		}
+
+		#sidebar{
+			grid-area: side;
+		}
+		#content{
+			grid-area: cont;
+		}
+		#footer{
+			grid-area: ft;
+		}
+
+	# grid-auto-rows: minmax(); --> for unknowwn no. of rows
+				    --> minmax() --> pixel size of rows
+		grid-auto-rows: minmax(100px,auto);
+
+
+# grid properties  (parent props):
+
+	justify-content : center ;
+
+	align-items :  center ;  ---> (vertical)cross axis 
+	 ||
+	 ||
+	 \/
+	(both combined) :
+			place-content : center;
+			place-items : center;
+
+	child / items properties : 
+		justify-self: center;
+		
+		align-self: center;
+
+		

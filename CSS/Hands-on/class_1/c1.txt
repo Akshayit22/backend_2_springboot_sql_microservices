@@ -1,0 +1,89 @@
+css : casceding style sheet 
+appearance, 
+
+selector : to select html element/s
+
+ex.
+table{
+	border: 1px solid black;
+}
+
+table : selector
+border : property
+1px solid black : value
+
+selector Types: 
+1. type selector
+2. tag select 
+
+selector Types: 
+
+1. class selector :  .dot
+
+	<p class="green">Engg.</p>
+	<p class="green">Student</p>
+
+	.green{
+		color: blueviolet;
+	}
+
+2. id selector : ID is unique  -->  #
+
+	<p id="dept">Computer Engg</p>
+
+	#dept{
+		color: chartreuse;
+	}
+
+3. pseudo-class selector : :hover
+	keyword added to the selector that special state of the selected elements,
+	ex. :hover , :visited , :active
+	.blue:hover{
+		color: chartreuse;
+	}
+
+4. universal s , 5. nested s , 6. attribute selector
+
+
+# adding style to html 
+ 
+ 1. Inline css
+ 2. Internal css  -> we put styles in <style> tag in head
+ 3. External css -> new file for .css include using link
+	<link rel="stylesheet" href="./style.css">
+
+# specificity --> specifie whice property to select
+
+high ---> low
+
+1. style attribute (inline) --> 2. ID selector --> 3. class, pseudo class, --> 4.element p{}
+
+# BOX MODEL IN css
+
+part between content and border (inside border)--> padding
+
+part  outside border (outside border)		---> margin
+
+
+# colors in html :
+ 1. hexadecimal value : # RR GG BB ex. #ff5443
+ 2. rgb(0,0,0)
+ 3. predefined colors (140 default)
+ 
+# Units in css : 
+	px : css 1px is 1/96 inch it is different from hardware pixel
+	mm :
+	cm : 
+	in : 
+
+	% unit : 10% of parents width/hight
+
+	relative: 
+		em : relative to parent element font size
+		rem : relative to rootel ement
+
+	vw : 1/100 times width of view port
+	vh : 1/100 times hight of view port
+
+
+	

@@ -1,0 +1,12 @@
+Topics :
+
+	- Display (inline, block, inline-block)
+	- Float
+	- Flex
+	"Default Styles, Positioning, Navigation Bar, Website Layout, Dropdowns, Selectors, CSS Functions"
+	Intro to Scss and basics
+	"Introduction to Grid, Advanced Grid Properties"
+	Responsive Design
+	Mini-Project - LinkedIn/ FB/ Insta Clone
+	"Overview of CSS Frameworks, with intro to Tailwind etc"
+	"Assignments: https://flexboxfroggy.com/, https://flukeout.github.io/"

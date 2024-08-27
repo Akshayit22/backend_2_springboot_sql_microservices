@@ -1,0 +1,119 @@
+
+resilience4j 
+
+Needs : 
+	# health of service AOP-Actuator config 
+			management.health.circuitbreakers.enabled=true
+			management.endpoints.web.exposure.include=health
+			management.endpoint.health.show-details=ALWAYS
+
+------------------------------------------------------------------------------------------------------------------------
+
+# Resilience circuitbreakers
+	
+	-----> @CircuitBreaker(name = "StudentOfSchoolBreaker", fallbackMethod = "StudentOfSchoolFallback")
+
+circuitbreakers Propeties : 
+
+		resilience4j.circuitbreaker.instances.StudentOfSchoolBreaker.register-health-indicator=true
+		resilience4j.circuitbreaker.instances.StudentOfSchoolBreaker.event-consumer-buffer-size=10
+		resilience4j.circuitbreaker.instances.StudentOfSchoolBreaker.failure-rate-threshold=50
+		resilience4j.circuitbreaker.instances.StudentOfSchoolBreaker.minimum-number-of-calls=5
+		resilience4j.circuitbreaker.instances.StudentOfSchoolBreaker.automatic-transition-from-open-to-half-open-enabled=true
+		resilience4j.circuitbreaker.instances.StudentOfSchoolBreaker.wait-duration-in-open-state=6s
+		resilience4j.circuitbreaker.instances.StudentOfSchoolBreaker.permitted-number-of-calls-in-half-open-state=3
+		resilience4j.circuitbreaker.instances.StudentOfSchoolBreaker.sliding-window-size=10
+		resilience4j.circuitbreaker.instances.StudentOfSchoolBreaker.sliding-window-type=COUNT_BASED
+
+
+Code Configurations in controller : @CircuitBreaker one method which utilizes other service
+		
+		@GetMapping("/students/{schoolId}")
+		@CircuitBreaker(name = "StudentOfSchoolBreaker", fallbackMethod = "StudentOfSchoolFallback")
+		public SchoolStudentResp getSchoolWithStudent(@PathVariable Long schoolId) {
+			System.out.println("CircuitBreaker..");
+			return schoolService.findSchoolWithStudent(schoolId);
+		}
+
+		// fallbackMethod -- with additional argument of exception
+
+			public SchoolStudentResp StudentOfSchoolFallback(Long SchoolId, Exception ex) {
+
+				System.out.println("StudentOfSchoolFallback called ..........");
+				System.err.println(ex.getMessage());
+
+				SchoolStudentResp objResp = new SchoolStudentResp("UNDEFINED", "UNDEFINED", null);
+				return objResp;
+			}
+
+
+
+---------------------------------------------------------------------------------------------------------------
+
+#resilience Retry
+	---> @Retry(name = "StudentOfSchoolRetry", fallbackMethod = "StudentOfSchoolFallback")
+	
+ Retry Propeties : 
+
+		resilience4j.retry.instances.StudentOfSchoolRetry.max-attempts=3
+		resilience4j.retry.instances.StudentOfSchoolRetry.wait-duration=5s
+
+Code Configurations in controller :
+		int RetryCount = 1;
+
+		@GetMapping("/students/v2/{schoolId}")
+		@Retry(name = "StudentOfSchoolRetry", fallbackMethod = "StudentOfSchoolFallback")
+		public SchoolStudentResp getSchoolWithStudentv2(@PathVariable Long schoolId) {
+			System.out.println("StudentOfSchoolRetry RetryCount .. " + RetryCount);
+			RetryCount++;
+
+			return schoolService.findSchoolWithStudent(schoolId);
+		}
+
+
+		// fallbackMethod -- with additional argument of exception
+
+			public SchoolStudentResp StudentOfSchoolFallback(Long SchoolId, Exception ex) {
+
+				System.out.println("StudentOfSchoolFallback called ..........");
+				System.err.println(ex.getMessage());
+
+				SchoolStudentResp objResp = new SchoolStudentResp("UNDEFINED", "UNDEFINED", null);
+				return objResp;
+			}
+
+
+
+-----------------------------------------------------------------------------------------------------------------
+
+# resilience Rate Limiter
+		---> @RateLimiter(name = "StudentOfSchoolRateLimiter", fallbackMethod = "StudentOfSchoolFallback")
+
+Rate Limiter Propeties : 
+
+		resilience4j.ratelimiter.instances.StudentOfSchoolRateLimiter.limit-refresh-period=4s
+		resilience4j.ratelimiter.instances.StudentOfSchoolRateLimiter.limit-for-period=2
+		resilience4j.ratelimiter.instances.StudentOfSchoolRateLimiter.timeout-duration=2s
+
+
+Code Configurations in controller :
+
+			@GetMapping("/students/v3/{schoolId}")
+			@RateLimiter(name = "StudentOfSchoolRateLimiter", fallbackMethod = "StudentOfSchoolFallback")
+			public SchoolStudentResp getSchoolWithStudentv3(@PathVariable Long schoolId) {
+
+				System.out.println("StudentOfSchoolRateLimiter  .. ");
+				return schoolService.findSchoolWithStudent(schoolId);
+			}
+
+
+		// fallbackMethod -- with additional argument of exception
+
+			public SchoolStudentResp StudentOfSchoolFallback(Long SchoolId, Exception ex) {
+
+				System.out.println("StudentOfSchoolFallback called ..........");
+				System.err.println(ex.getMessage());
+
+				SchoolStudentResp objResp = new SchoolStudentResp("UNDEFINED", "UNDEFINED", null);
+				return objResp;
+			}

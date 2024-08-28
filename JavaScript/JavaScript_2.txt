@@ -1,0 +1,95 @@
+------------------------------------------------------
+                Hoisting
+
+// Hoisting 
+"use strict";
+// Not declared but it gives output 
+console.log(sum(10,45)); // 55
+
+function sum(a,b)
+{
+    return a+b;
+}
+
+// In Variables it is happens with only var varible 
+// let and const type variable also have hoisting but not declare by undefined just like var
+
+console.log(x) //undefined
+var x;
+x = 10;
+
+// Now Try Let 
+console.log(y) //access b4 intialization that mean it top the declaration but not intialize it with undefined
+
+let y;
+y = 10;
+
+
+// Another Method = "use strict"
+//For Avoid this we use -  "use strict" at the top of file;
+i = 10;
+console.log(i); //10 not error
+
+
+// Now comes error 
+
+
+---------------------------------------------------------------------------
+                arrow function
+
+let add = (a,b) =>
+{
+    let sum = a+b;
+    return sum; 
+}
+
+---------------------------
+            Arguments
+
+let add = function addTwoNumbers(a,b)
+{
+    // console.log(arguments);
+    let sum = 0;
+    for(let key of arguments)
+        sum += key;
+    return sum; 
+}
+
+console.log(add(num1,num2,num3,num4,num5,num6,num7,num8));   
+
+------
+let add = function addTwoNumbers(a,b,...args) 
+{
+    console.log(args);
+    let sum = 0;
+    for(let key of args)
+        sum += key;
+    return sum; 
+}
+
+----------------------------------------------
+            Getter and Setter
+
+let person = {
+    firstName : "Priyash",
+    lastName : "Patel",
+
+    // Getter
+    get fullName()
+    {
+        return person.firstName + " " + person.lastName;
+    },
+
+    // Setter
+    set fullName(value)
+    {
+        let name = value.split(" ");
+        this.firstName = name[0];
+        this.lastName = name[1];
+    }
+}
+
+console.log(person.fullName);
+person.fullName = "Khushi Patel";
+console.log(person.fullName);
+

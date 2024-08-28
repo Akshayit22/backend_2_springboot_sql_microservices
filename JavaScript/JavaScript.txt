@@ -1,0 +1,235 @@
+// Add Property in Object 
+rectangle1.area = rectangle1.length * rectangle1.breadth;
+
+
+// Now remove properties from Objec
+delete rectangle1.area;
+console.log(rectangle1);
+
+
+// Reference Points Memory Location 
+let c = {value:10};
+let d = c;
+
+c.value++;
+console.log(c.value) //11
+console.log(d.value) //11
+
+----------------------------------------------------------
+const Employee = {
+    name : "NameofEmployee",
+    age : 15,
+
+    address : {
+        street : 69,
+        colony : "L_LASAN",
+        district : "No Way Home",
+    }
+}
+
+// for-in
+for(let key in Employee){
+    console.log(key, Employee[key]);
+}
+
+for(let key in Employee.address)
+{
+    console.log(key, Employee.address[key]);
+}
+
+// for-of
+// for-in loop 
+for(let key in Employee)
+{
+    console.log(key, Employee[key]);
+}
+
+// for-of loop 
+for(let i of Object.keys(Employee)){
+    console.log(i, Employee[i]);
+}
+
+// check property is present in obj or not
+if( "age" in Employee){
+        console.log("age property is present in Employee Object")
+}
+
+-----------------------------------------------------------
+
+//object cloning ---> 1 (iterative)
+
+        const duplicate = {};
+        for(let key in Employee)
+        {
+        duplicate[key] = Employee[key];
+        }
+
+//object cloning ---> 2 (object method)
+
+        const duplicate = Object.assign({}, Employee);
+        console.log(duplicate);
+
+// object cloning ---> 3 (spread operator)
+
+        const duplicate = {...Employee};
+        console.log(duplicate);
+
+-----------------------------------------------------------------------
+
+                Math Function 
+
+ Math.E * Math.PI * Math.LOG2E
+
+// Methods 
+
+// #1 - Round 
+console.log(Math.round(12.79)); // 13
+console.log(Math.round(12.49)); // 12
+
+// #2 - Ceil 
+console.log(Math.ceil(12.79)); //13
+
+// #3 - Floor 
+console.log(Math.floor(12.79)); //12
+
+// #4 - Random 
+console.log(Math.random()); //....................
+
+// #5 - min 
+console.log(Math.min(10,12)); //10
+
+// #6 - Random 
+console.log(Math.max(10,12)); //12
+
+// #7 - pow 
+console.log(Math.pow(2,10)); //1024
+
+
+// Returning a random integer between two bounds
+// LowerBound - 40 
+// Upper Bound - 100
+console.log(Math.round(Math.random() * (100 - 40)) + 40);
+
+
+-------------------------------------------------------------
+Date Function
+
+date = new Date("2003-04-16T11:55:21Z");
+console.log(date.toString());
+console.log(date.toDateString());
+console.log(date.toTimeString());
+console.log(date.toISOString());
+console.log(date.toUTCString());
+console.log(date.toJSON());
+console.log(date.toLocaleString());
+console.log(date.toLocaleDateString());
+console.log(date.toLocaleTimeString());
+
+
+// Get MEthods 
+console.log(date.getFullYear());
+console.log(date.getDay());
+console.log(date.getMonth());
+console.log(date.getHours());
+console.log(date.getMinutes());
+console.log(date.getSeconds());
+
+
+-----------------------------------------------------------
+
+                        Array
+
+let arr = [1,2,5,4,7];
+console.log(arr);
+first.forEach(element => console.log(element));
+
+
+// Insertion at Beginning of Array
+arr.unshift(10);
+console.log(arr);
+
+
+// Insertion at End of Array 
+arr.push(8);
+console.log(arr);
+
+
+// Insertion at Middle 
+arr.splice(3,0,100);
+console.log(arr);
+
+----------
+
+console.log(arr.indexOf(5)); //2
+console.log(arr.indexOf(50)); //-1
+
+console.log(arr.includes(5)); //true
+console.log(arr.includes(50)); //false
+
+------------------
+// Remove at Beginning of Array
+arr.shift();
+console.log(arr);
+
+
+// Remove at End of Array 
+arr.pop();
+console.log(arr);
+
+
+// Remove at Middle 
+arr.splice(1,1);
+console.log(arr);
+
+// array slice
+newArray = arr.slice(2,5);
+
+----- combining two arrays --------------
+// 1
+        let combine = firstArray.concat(secondArray);
+        console.log(combine);
+
+// 2
+        let combine = [...firstArray, ...secondArray];
+        console.log(combine);
+
+------------------------------------------------------
+
+let first = [1, 2, 3, 4];
+
+let joined = first.join('__');
+console.log(joined); // ->  1__2__3__4
+
+
+---
+let ans = arr.filter(value => value > 4 && value % 4 === 0);
+console.log(ans);
+
+--
+
+let arrSquare = arr.map(val => val * val);
+console.log(arrSquare);
+
+---
+let sum = arr.reduce((totalSum,val) => totalSum + val,0);
+console.log(sum);
+---
+let chain = arr.filter(val => val > 2).map(num => num*num).filter(val => val&1);
+console.log(chain);
+
+------------------------------------------------------
+const maxSpeed = {
+    car: 300, 
+    bike: 60, 
+    motorbike: 200, 
+    airplane: 1000,
+    helicopter: 400, 
+    rocket: 8 * 60 * 60
+};
+
+const sortable = Object.fromEntries(
+    Object.entries(maxSpeed).sort(([,a],[,b]) => a-b)
+);
+
+
+                

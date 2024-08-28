@@ -1,0 +1,197 @@
+-----------------------------------------------------------------------
+Iterating 1000 times
+
+Normal for Loop ---> 21701.34419999992ms  #4
+For Of loop		---> 577.8695000000007ms  #2
+forEach Loop	---> 553.9999999999999ms  #1
+while loop		---> 595.4310000000114ms  #3
+
+
+// It is standard way to measure how long your code taken to run.
+let size = 1000;
+let arr = Array(size).fill(1);
+// console.log(arr);
+
+// Iterate With Normal For Loop 
+let t1 = performance.now();
+for(let i = 0; i < size;i++){
+    console.log(arr[i]);
+}
+let t2 = performance.now();
+console.log(`Normal Loop Takes Time to Run ${t2-t1}ms`);// 21701.344199999992ms
+
+
+// Iterate with for of 
+t1 = performance.now();
+for(let i of arr)
+{
+    console.log(i);
+}
+t2 = performance.now();
+console.log(`For Of Takes Time to Run ${t2-t1}ms`);// 577.8695000000007ms
+
+// For Each Loop 
+t1 = performance.now();
+arr.forEach((value)=>{
+    console.log(value);
+});
+t2 = performance.now();
+console.log(`For Each Takes Time to Run ${t2-t1}ms`);// 553.99 ms
+
+// While Loop 
+t1 = performance.now();
+let i = 0;
+while (i < size) {
+    console.log(arr[i]);
+    i++;
+}
+t2 = performance.now();
+console.log(`While Loop Takes Time to Run ${t2-t1}ms`);// 595.4310000000114ms
+
+----------------------------------------------------------------------
+		Async
+
+let num1 = 10;
+let num2 = 20;
+
+setTimeout(() => {
+  console.log(num1, num2);
+}, 5000);
+
+setTimeout(() => {
+  console.log("Sum: ", num1 + num2);
+}, 5000);
+
+console.log("Hellow World: ");
+
+-----------------------------------------------------------------------
+	
+			Callback  Hell :
+
+	const makeTea = nextStep => {
+	    getMilk(function(milk) {
+	        turnOnGas(milk,function onGas(){
+	            addIngredient(teaLeaf,sugar,function add(){
+	                boil(function Boiled() {
+	                    filter(tea,function teaReady(tea){
+	                        nextStep(tea);
+	                    });
+	                });
+	            });
+	        });
+	    });
+	}
+
+	makeTea(milk);
+
+------------------------------------------------------------------------
+
+			promise
+
+let promise1 = new Promise((resolve, reject) => {
+	  setTimeout(() => console.log("From Promise 1"), 5000);
+	  resolve(69);
+});
+
+
+let promise2 = new Promise((resolve, reject) => {
+	  setTimeout(() => console.log("From Promise 2"), 5000);
+	  reject(new Error("Error while trying to resolve"));
+});
+
+
+promise1.then((value) => console.log(value));
+
+promise1.then((value) => console.log(value),(error) => console.log(error));
+
+promise2.catch((error) => console.log(error));
+
+
+----------------------------------------------------------------------
+
+				Promise chaining
+
+	let p1 = new Promise((resolve, reject) => {
+		  setTimeout(() => {
+		    console.log("Resolved after 2 Seconds");
+		    resolve(165);
+		  }, 2000);
+	});
+
+--	
+
+	p1.then((value) => {
+	  	console.log(value);
+	    return new Promise((resolve, reject) => {
+	            resolve("Promise2");
+	    });
+
+	})
+	.then((value) => {
+	    console.log(value);
+	    return 2;
+	  })
+	.then((value) => {
+	    console.log(value);
+	    console.log("Finished Chaining");
+	  });
+
+----------------------------------------------------------------------
+
+						Promise All
+
+let p1 = new Promise((resolve,reject) => {
+    setTimeout(() => { resolve("Promise1") }, 3000)
+}); 
+
+let p2 = new Promise((resolve,reject) => {
+    setTimeout(() => { reject(new Error("OO MM GG Error Comes")) }, 2000)
+}); 
+
+let p3 = new Promise((resolve,reject) => {
+    setTimeout(() => { resolve("Promise3") }, 1000)
+}); 
+
+// Promise All Method 
+// Promise all waits for all promise to resolve and returns the array of their result
+------IMP--------
+
+let promiseAll = Promise.all([p1,p2,p3]);
+
+allPs.then((value) => {
+    console.log(value);
+}).catch((err) => {console.log(err);});
+
+
+----------------------------
+Promise.allSettled() method in JavaScript is used to get a promise when all inputs are settled that is either fulfilled or rejected.
+
+
+let promiseSettled = Promise.allSettled([p1,p2,p3]);
+promiseSettled.then((value) => {
+    console.log(value);
+});
+
+// output : -->
+[                                                          
+	{ status: 'fulfilled', value: 'Promise1' },                
+	{ status: 'rejected', reason: [Error: OO MM GG ErrorComes]},
+	{ status: 'fulfilled', value: 'Promise3' }               
+] 
+
+--------------------------------------------------------------------
+// // The Promise.race() method returns a promise 
+// that fulfills or rejects as soon as one of the 
+// promises in an iterable fulfills or rejects, with 
+// the value or reason from that promise.
+
+let race = Promise.race([p1,p2,p3]);
+race.then((value) => {
+    console.log(value);
+}).catch((err) => {console.log(err)});
+
+----------------------------------------
+// This method returns a promise that fulfills or
+// rejects as soon as resolve of the promises, which we
+// have passed inside the iterable object-like array,
+// gets successfully fulfilled or resolved.

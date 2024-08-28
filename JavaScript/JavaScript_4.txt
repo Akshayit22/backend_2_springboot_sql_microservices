@@ -1,0 +1,19 @@
+---------------------------------------------------------------------
+			Closures
+
+function outer() {
+	const name = "John"; 
+	function inner() {
+		console.log(`Hello, ${name}!`);
+	}
+	return inner;
+}
+
+const greeting = outer();
+greeting(); // logs "Hello, John!"
+ 
+// ability to remeber parent function variables after returning child function 
+
+
+---------------------------------------------------------------------
+			

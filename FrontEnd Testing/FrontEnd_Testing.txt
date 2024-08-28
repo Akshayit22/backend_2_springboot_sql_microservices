@@ -1,0 +1,27 @@
+
+--------------------- JEST -------------------------
+
+"scripts": {
+    "test": "jest --coverage"
+}
+
+filename.js ----> original code to be tested.
+
+
+filename.test.js ---> we write test in this file
+
+ex.:
+
+test('checking addition 2 :', () => {
+        expect(sum(-100, -200))
+                .toBe(-300)
+})
+
+
+
+---------------------- Puppeteer -----------------------
+
+        FrontEnd automation testing tool.
+
+        use can use puppeteer for frontend automation testing
+        it used mock chromium browser to automate testing.

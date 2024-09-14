@@ -1,0 +1,79 @@
+
+Containers :
+
+	Virtual Machine : virtual seperation of virtual os in ine physical server.(using hypervisior)
+
+	Containers : don't complete have os, it is light weight container
+
+	Docker file --> build -> images --> execute --> container
+
+
+Docker :
+
+	Docker implement the consept of Containerization. (containerization platform)
+
+
+	life cycle off Docker : 
+
+    sudo apt-get install openjdk-17-jdk openjdk-17-jre
+
+    sudo apt-get remove openjdk-*
+
+> 
+
+	   sudo apt update
+  161  sudo apt install docker.io -y
+  162  sudo apt install docker.io
+  163  sudo apt-get install docker.io
+  164  sudo apt-get install docker
+  165  history
+  166  sudo systemctl status docker
+  167  docker run hello-world
+  168  sudo docker run hello-world
+
+
+  169  sudo usermod -aG docker ubuntu
+  	and restart
+
+
+
+  191  docker build -t akshaytelang395/my-first-docker-image:lastest .
+  192  clear
+  193  docker run -it akshaytelang395/my-first-docker-image:lastest
+  194  docker ps
+  195  docker ps -l
+
+  docker container ls -a
+
+  > docker exec <container name> <commands>
+
+  > docker exec <container name/ID> bash (to intenter into container)
+
+  > docker run -it -p 8080:8080 <image_name>
+  				   (port on which you want expose in Machine):(port running in image)
+  				   (outer):(inner image)
+
+ >  docker run -it -p 8080:8080 -e key=value <image_name>
+ 			(env)
+
+Docker-compose.yml --> multiple services.
+
+ > docker compose up
+
+ > docker compose up -d (run in background)
+
+ > docker compose down
+
+ > docker compose remove
+
+Docker mysql:
+ > docker run mysql
+
+ > docker run -it -e MYSQL_ROOT_PASSWORD=root mysql
+
+ > docker exec -it <container_name> bash
+ > mysql -u root -p
+
+ bankSystem-0.0.1-SNAPSHOT.jar
+ http://localhost:8080/api-docs/swagger-ui/index.html
+ sudo apt-get purge openjdk-\*

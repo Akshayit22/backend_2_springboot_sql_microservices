@@ -1,0 +1,99 @@
+-----------------------------------------
+
+1. AWS CLI installed and Configured.
+
+-----------------------------------------
+
+2. VPC Configured.
+	- public / private ips
+	- route tables
+	- subnets
+	- internet gateway
+
+-----------------------------------------
+
+3. IAM
+	- groups 
+	- policies
+	- users
+-----------------------------------------
+
+4. EC2
+	- configured with my own VPC
+
+-----------------------------------------
+
+5. RDS 
+	- connected to Ec2 instance
+	- ssh configurations to connect to local machine with instance setup
+
+	- connected through ssh tunnelling with EC2
+	- ssh -i "ec2Key.pem" -L 3336:rdsinstance.xxx.xxx.rds.amazonaws.com:3306 ec2-user@ec2-34-244-136-223.xxxcompute.amazonaws.com -N -f
+	- lsof -i4 -P | grep -i "listen" | grep LOCAL_PORT
+	  nc -zv 127.0.0.1 LOCAL_PORT
+
+	- mysql -h 127.0.0.1 -P LOCAL_PORT -u RDS_USER -p
+
+-----------------------------------------
+
+6. S3
+	- bucket versioning
+	- bucket access restriction policy
+	- static side deploying
+
+	{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "PublicRead",
+			"Effect": "Allow",
+			"Principal": "*",
+			"Action": "s3:GetObject",
+			"Resource": "arn:aws:s3:::static-web2-ak-bucket/*"
+		}
+	]
+}
+
+---------------------------------------
+
+7. cloud watch :
+	- log groups
+	- metrics
+	- dashboards
+	- alert based on usage
+	- sns topic mail sending
+
+---------------------------------------
+
+8. SNS : 
+	-  topic
+
+9. AWS End User Messaging
+	- phone , voice, messaging
+	- Push notifications
+
+-----------------------------------------
+
+10. Lambda
+	- compute + serverless function
+	- triggers
+	- can connect to other aws service
+
+
+
+---------------------------------------------
+
+cloud front
+cloud trail
+codeCommit
+
+AKM
+
+Load balancer
+step function
+
+
+
+image
+load balancer
+route 53

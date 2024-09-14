@@ -1,0 +1,107 @@
+
+VPC --
+
+	v4 Cidi --- 
+
+	10.0.0.0/24 = 256 ips
+	10.0.0.0/16 = 2^16 ips --
+
+
+- create subnet (public ) :
+
+	put above vpc (10.0.0.0/16)
+
+	put name subnet (pub/priv) / zone / 
+
+	v4 vpc cidr block : 
+		10.0.0.0/16
+
+	v4 subnet cidr block : 
+		10.0.1.0/24
+
+- create subnet ( private ) :
+	
+	v4 vpc cidr block : 
+		10.0.0.0/16
+
+	v4 subnet cidr block : 
+		10.0.2.0/24
+
+-create internet gateway 
+
+	 - attack vpc 
+
+
+-create roting table (public ) :
+	-name
+	-vpc 
+
+	- connect to internet gateway
+
+-create roting table (private ) :
+	-name
+	-vpc 
+
+
+- edit public route table to internet gateway
+
+	- go to roting table (public
+	- go to edit route 
+	- add- ip - 0.0.0.0 - Internet gateway -done
+
+
+- connect public  route table to 
+
+	- subnet association - edit - select route table 
+
+
+- go to security group
+-
+
+ create - 
+ 	 name
+ 	 vpc 
+
+ 	 outbound rule :
+ 	 	default
+
+
+
+ ec2 --
+  attach - vpc createed 
+  attach - subnet 
+
+  auto assign public ip = enable
+
+  select security gruop created
+
+
+----------------
+ port 22 error: 
+ 	configure inbound rule : for port 22
+
+ 	go to security group :
+ 	edit inbound rile 
+ 	 shh - anywhere - 0.0.0.0
+
+ 	 allow aws connect specific ip address to connect via ssh
+
+
+ 	 go to security group - add inbound rule:
+
+ 	 - aws ip
+ 	 - our ip address
+
+
+
+---
+ rds - 
+ 	choose vpc  
+ 	subnet
+
+
+
+
+---------------------------------------------------------
+
+EC2 try to communicate to www then we use NAT gateway which masks the machines ip address.

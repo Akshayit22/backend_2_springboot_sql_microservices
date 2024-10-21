@@ -1,0 +1,32 @@
+
+Typescript :
+
+types: 
+		boolean, number, string, undefined, null, symbol, bigint
+
+arrays: 
+		let array: Array<number> = [1,2,3];
+
+		let set:Set<number> = new Set([1,2,3]);
+
+tuple : 
+		let tuple: [number, number] = [0,0];
+
+objects :
+ 
+		let center = {
+			x:0,
+			y:0,
+		}
+
+		let center : {x:number, y:number} = {
+			x:0,
+			y:0,
+		}
+
+
+------------------ or -----------------   
+
+		type Point = { x:number, y:number};
+
+		let unit:Point = {x:0,y:0}
